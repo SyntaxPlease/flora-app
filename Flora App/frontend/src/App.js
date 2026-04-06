@@ -1209,4 +1209,3 @@ export default function FloraApp() {
     </>
   );
 }
-<button onClick={() => setSection("archetype")}>🧬 My Gut Archetype</button>

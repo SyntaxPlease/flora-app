@@ -337,7 +337,7 @@ function AuthScreen({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API = "http://localhost:8000";
+  const API = "https://flora-backend-uae5.onrender.com";
 
   const submit = async () => {
     setError(""); setLoading(true);
@@ -764,7 +764,7 @@ function SectionCheckin({ user, onBack }) {
   const [saved, setSaved] = useState(false);
 
   const saveCheckin = async () => {
-    try { await fetch("http://localhost:8000/api/checkin", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({user_id:user.id,...checkin}) }); } catch(e) {}
+    try { await fetch("https://flora-backend-uae5.onrender.com/api/checkin", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({user_id:user.id,...checkin}) }); } catch(e) {}
     setSaved(true); setTimeout(()=>setSaved(false),2500);
   };
 
@@ -970,7 +970,7 @@ function Dashboard({ user, answers, onRetake }) {
     async function fetchAssess() {
       try {
         // ── FIXED: was /analyze, now /api/assess ──
-        const res = await fetch("http://localhost:8000/api/assess", {
+        const res = await fetch("https://flora-backend-uae5.onrender.com/api/assess", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
 body: JSON.stringify({ user_id: user.id, answers: answers }),        });
@@ -1141,7 +1141,7 @@ function SectionArchetype({ result, answers, onBack }) {
   const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/archetype", {
+    fetch("https://flora-backend-uae5.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ answers })
@@ -1209,4 +1209,3 @@ export default function FloraApp() {
     </>
   );
 }
-<button onClick={() => setSection("archetype")}>🧬 My Gut Archetype</button>

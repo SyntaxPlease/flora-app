@@ -325,7 +325,7 @@ function BackBtn({ onClick }) {
     <button onClick={onClick} style={{ display:"inline-flex", alignItems:"center", gap:"8px", background:"rgba(255,255,255,0.05)", border:`1px solid ${C.border2}`, borderRadius:"10px", padding:"8px 16px", color:C.muted, fontSize:"0.85rem", cursor:"pointer", fontFamily:C.sans, marginBottom:"24px", transition:"all 0.15s" }}
       onMouseEnter={e=>{e.currentTarget.style.color=C.text;e.currentTarget.style.background="rgba(255,255,255,0.08)"}}
       onMouseLeave={e=>{e.currentTarget.style.color=C.muted;e.currentTarget.style.background="rgba(255,255,255,0.05)"}}>
-      ← Back to Home
+      ← Back
     </button>
   );
 }
@@ -608,7 +608,7 @@ function SectionAnalysis({ result, answers, onBack }) {
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px" }}>
             <Card>
               <Label>Foods that help</Label>
-              {[["🍌","Banana","Feeds Lactobacillus — eat daily"],["🧄","Garlic","Powerful prebiotic"],["🌾","Oats","Beta-glucan boosts Bifidobacterium"],["🫙","Kefir/Curd","Direct probiotic source"],["🥦","Broccoli","Protects gut lining"],["🍎","Apple","Pectin feeds diverse bacteria"]].map(([e,n,b],i)=>(
+              {[["🍌","Banana","Feeds Lactobacillus"],["🧄","Garlic","Powerful prebiotic"],["🌾","Oats","Boosts Bifidobacterium"],["🫙","Kefir/Curd","Direct probiotic"],["🥦","Broccoli","Protects gut lining"],["🍎","Apple","Feeds diverse bacteria"]].map(([e,n,b],i)=>(
                 <div key={i} style={{ display:"flex", gap:"12px", padding:"10px 0", borderBottom:`1px solid ${C.border2}` }}>
                   <span style={{ fontSize:"1.3rem" }}>{e}</span>
                   <div><div style={{ fontSize:"0.85rem", fontWeight:600, color:C.green }}>{n}</div><div style={{ fontSize:"0.75rem", color:C.muted }}>{b}</div></div>
@@ -617,7 +617,7 @@ function SectionAnalysis({ result, answers, onBack }) {
             </Card>
             <Card>
               <Label>Foods to limit</Label>
-              {[["🥛","Dairy","May cause bloating"],["🌶️","Spicy food","Increases heartburn"],["☕","Excess coffee","Disrupts Firmicutes"],["🍺","Alcohol","Reduces microbiome diversity"],["🍔","Ultra-processed","Feeds harmful bacteria"]].map(([e,n,b],i)=>(
+              {[["🥛","Dairy","May cause bloating"],["🌶️","Spicy food","Increases heartburn"],["☕","Excess coffee","Disrupts Firmicutes"],["🍺","Alcohol","Reduces diversity"],["🍔","Ultra-processed","Feeds harmful bacteria"]].map(([e,n,b],i)=>(
                 <div key={i} style={{ display:"flex", gap:"12px", padding:"10px 0", borderBottom:`1px solid ${C.border2}` }}>
                   <span style={{ fontSize:"1.3rem" }}>{e}</span>
                   <div><div style={{ fontSize:"0.85rem", fontWeight:600, color:C.red }}>{n}</div><div style={{ fontSize:"0.75rem", color:C.muted }}>{b}</div></div>
@@ -648,7 +648,7 @@ function SectionMLModels({ result, onBack }) {
       </div>
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"20px", marginBottom:"24px" }}>
         <Card glow>
-          <Label>Model 1 — XGBoost Score</Label>
+          <Label>Model 1 — XGBoost</Label>
           <div style={{ display:"flex", alignItems:"center", gap:"20px", marginBottom:"16px" }}>
             <Ring pct={result.score} color={result.tierColor} size={110}>
               <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:result.tierColor, fontWeight:700, lineHeight:1 }}>{result.score}</div>
@@ -656,55 +656,46 @@ function SectionMLModels({ result, onBack }) {
             </Ring>
             <div>
               <div style={{ fontFamily:C.serif, fontSize:"1.1rem", color:result.tierColor, marginBottom:"4px" }}>{result.tierEmoji} {result.tier}</div>
-              <div style={{ fontSize:"0.78rem", color:C.muted }}>Weighted scoring across 25 features</div>
               <div style={{ fontSize:"0.72rem", color:C.muted, marginTop:"4px" }}>Confidence: {result.confidence}%</div>
             </div>
           </div>
-          <div style={{ padding:"10px 14px", background:"rgba(255,255,255,0.03)", borderRadius:"10px", fontSize:"0.78rem", color:C.muted, lineHeight:1.6 }}>
-            XGBoost uses weighted feature importance — each answer contributes proportionally to the final score based on its clinical significance.
-          </div>
         </Card>
         <Card>
-          <Label>Model 2 — Decision Tree Risk</Label>
+          <Label>Model 2 — Decision Tree</Label>
           <div style={{ display:"flex", alignItems:"center", gap:"20px", marginBottom:"16px" }}>
             <Ring pct={dt.score} color={dt.color} size={110}>
               <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:dt.color, fontWeight:700, lineHeight:1 }}>{dt.emoji}</div>
             </Ring>
             <div>
               <div style={{ fontFamily:C.serif, fontSize:"1.1rem", color:dt.color, marginBottom:"4px" }}>{dt.label}</div>
-              <div style={{ fontSize:"0.78rem", color:C.muted }}>Rule-based tree traversal</div>
               <div style={{ fontSize:"0.72rem", color:C.muted, marginTop:"4px" }}>Node: {dt.node.replace(/_/g," ")}</div>
             </div>
-          </div>
-          <div style={{ padding:"10px 14px", background:"rgba(255,255,255,0.03)", borderRadius:"10px", fontSize:"0.78rem", color:C.muted, lineHeight:1.6 }}>
-            {dt.desc}
           </div>
         </Card>
       </div>
       <Card style={{ marginBottom:"20px" }}>
-        <Label>Decision Tree — How the model reached your result</Label>
+        <Label>Decision Tree Path</Label>
         <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
           {dt.path.map((step, i) => (
             <div key={i} style={{ display:"flex", gap:"12px", alignItems:"flex-start", padding:"10px 14px", background:"rgba(255,255,255,0.02)", borderRadius:"10px", border:`1px solid ${C.border2}` }}>
               <div style={{ flexShrink:0, width:"24px", height:"24px", borderRadius:"50%", background:C.greenDim, border:`1px solid ${C.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", fontWeight:700, color:C.green }}>{i+1}</div>
               <div style={{ fontSize:"0.83rem", color:C.text, lineHeight:1.6 }}>{step}</div>
-              {i < dt.path.length-1 && <div style={{ marginLeft:"auto", color:C.muted, fontSize:"0.8rem" }}>↓</div>}
             </div>
           ))}
           <div style={{ padding:"12px 16px", background:`${dt.color}10`, border:`1px solid ${dt.color}30`, borderRadius:"10px", display:"flex", gap:"12px", alignItems:"center" }}>
             <div style={{ width:"10px", height:"10px", borderRadius:"50%", background:dt.color, flexShrink:0 }} />
-            <div style={{ fontSize:"0.85rem", color:dt.color, fontWeight:600 }}>Final classification: {dt.label}</div>
+            <div style={{ fontSize:"0.85rem", color:dt.color, fontWeight:600 }}>Final: {dt.label}</div>
           </div>
         </div>
       </Card>
       <Card>
-        <Label>Top Features Driving Both Models</Label>
+        <Label>Top Features</Label>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
           {result.importance.slice(0,8).map((f,i)=>(
             <div key={f.key} style={{ padding:"10px 12px", background:"rgba(255,255,255,0.02)", borderRadius:"8px", border:`1px solid ${C.border2}` }}>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"5px" }}>
                 <span style={{ fontSize:"0.8rem", textTransform:"capitalize", color:C.text }}>{f.label}</span>
-                <span style={{ fontSize:"0.72rem", color:C.muted }}>{f.weight}% weight</span>
+                <span style={{ fontSize:"0.72rem", color:C.muted }}>{f.weight}%</span>
               </div>
               <Bar pct={f.pct} color={f.pct>=60?C.green:f.pct>=35?C.yellow:C.red} height="4px" delay={`${i*0.05}s`} />
             </div>
@@ -764,7 +755,7 @@ function SectionCheckin({ user, onBack }) {
   const [saved, setSaved] = useState(false);
 
   const saveCheckin = async () => {
-    try { await fetch("https://flora-backend-uae5.onrender.com/api/checkin", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({user_id:user.id,...checkin}) }); } catch(e) {}
+    try { await fetch("https://flora-backend-uae5.onrender.com/api/checkin", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({user_id:user?.id,...checkin}) }); } catch(e) {}
     setSaved(true); setTimeout(()=>setSaved(false),2500);
   };
 
@@ -959,189 +950,12 @@ function SectionMicrobiome({ result, onBack }) {
   );
 }
 
-// ─── DASHBOARD ───────────────────────────────────────────────────────
-function Dashboard({ user, answers, onRetake }) {
-  const [section, setSection] = useState(null);
-  const [apiResult, setApiResult] = useState(null);
-  const [apiLoading, setApiLoading] = useState(true);
-  const [apiError, setApiError] = useState(null);
-
-  useEffect(() => {
-    async function fetchAssess() {
-      try {
-        // ── FIXED: was /analyze, now /api/assess ──
-        const res = await fetch("https://flora-backend-uae5.onrender.com/api/assess", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ user_id: user.id, answers: answers }),        });
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.detail || `Backend returned ${res.status}`);
-        }
-        const data = await res.json();
-        setApiResult(data);
-      } catch (e) {
-        setApiError(e.message);
-        setApiResult(null);
-      }
-      setApiLoading(false);
-    }
-    fetchAssess();
-  }, []);
-
-  const jsResult = analyze(answers);
-
-  const result = apiResult
-    ? {
-        ...jsResult,
-        score:      apiResult.score      ?? jsResult.score,
-        catScores:  apiResult.catScores  ?? jsResult.catScores,
-        d:          apiResult.d          ?? jsResult.d,
-        confidence: apiResult.confidence ?? jsResult.confidence,
-        importance: apiResult.importance ?? jsResult.importance,
-        tier:       apiResult.score >= 75 ? "Thriving" : apiResult.score >= 55 ? "Growing" : apiResult.score >= 35 ? "Wilting" : "Struggling",
-        tierEmoji:  apiResult.score >= 75 ? "🌸" : apiResult.score >= 55 ? "🌿" : apiResult.score >= 35 ? "🌾" : "🥀",
-        tierColor:  apiResult.score >= 75 ? C.green : apiResult.score >= 55 ? C.lime : apiResult.score >= 35 ? C.yellow : C.red,
-        scoredBy:   "XGBoost (backend)",
-      }
-    : { ...jsResult, scoredBy: "Rule-based (offline)" };
-
-  if (apiLoading) {
-    return (
-      <div style={{ minHeight:"100vh", background:C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"20px" }}>
-        <style>{css}</style>
-        <div style={{ fontSize:"3rem" }} className="float">🌿</div>
-        <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:C.green }}>Analysing your gut health…</div>
-        <div style={{ fontSize:"0.85rem", color:C.muted }}>Running K-Means Clustering+XGBoost + Decision Tree models</div>
-        <div style={{ display:"flex", gap:"6px" }}>{[0,1,2].map(j=>(<div key={j} style={{ width:"10px", height:"10px", borderRadius:"50%", background:C.green, animation:`typing 1.2s ${j*0.2}s infinite` }} />))}</div>
-      </div>
-    );
-  }
-
-  if (section === "analysis")   return <PageWrapper onRetake={onRetake}><SectionAnalysis result={result} answers={answers} onBack={()=>setSection(null)} /></PageWrapper>;
-  if (section === "ml")         return <PageWrapper onRetake={onRetake}><SectionMLModels result={result} onBack={()=>setSection(null)} /></PageWrapper>;
-  if (section === "forecast")   return <PageWrapper onRetake={onRetake}><SectionForecast result={result} onBack={()=>setSection(null)} /></PageWrapper>;
-  if (section === "checkin")    return <PageWrapper onRetake={onRetake}><SectionCheckin user={user} onBack={()=>setSection(null)} /></PageWrapper>;
-  if (section === "food")       return <PageWrapper onRetake={onRetake}><SectionFoodLog user={user} onBack={()=>setSection(null)} /></PageWrapper>;
-  if (section === "microbiome") return <PageWrapper onRetake={onRetake}><SectionMicrobiome result={result} onBack={()=>setSection(null)} /></PageWrapper>;
-if (section === "archetype") return <PageWrapper onRetake={onRetake}><SectionArchetype result={result} answers={answers} onBack={()=>setSection(null)} /></PageWrapper>;
-
-  return (
-    <div style={{ minHeight:"100vh", background:C.bg, fontFamily:C.sans, color:C.text }}>
-      <style>{css}</style>
-      <div style={{ padding:"20px 32px", borderBottom:`1px solid ${C.border2}`, display:"flex", justifyContent:"space-between", alignItems:"center", background:C.surface, position:"sticky", top:0, zIndex:50 }}>
-        <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:C.green, fontWeight:700 }}>🌿 Flora</div>
-        <div style={{ display:"flex", gap:"8px", alignItems:"center" }}>
-          {/* Show backend status */}
-          {apiError && (
-            <span style={{ fontSize:"0.72rem", color:C.yellow, background:`${C.yellow}15`, border:`1px solid ${C.yellow}30`, padding:"4px 10px", borderRadius:"50px" }}>
-              ⚠️ Offline mode — {apiError}
-            </span>
-          )}
-          <span style={{ fontSize:"0.85rem", color:C.muted }}>Hi, {user.name}</span>
-          <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:`linear-gradient(135deg,${C.green},${C.teal})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.9rem" }}>👤</div>
-        </div>
-      </div>
-
-      <div style={{ padding:"32px", maxWidth:"1100px", margin:"0 auto" }}>
-        <div className="fadeUp" style={{ display:"flex", gap:"32px", alignItems:"center", marginBottom:"40px", padding:"32px", background:`linear-gradient(135deg,rgba(74,222,128,0.07),rgba(45,212,191,0.04))`, border:C.border, borderWidth:1, borderStyle:"solid", borderRadius:"24px" }}>
-          <Ring pct={result.score} color={result.tierColor} size={180} strokeWidth={14}>
-            <div style={{ fontFamily:C.serif, fontSize:"2.8rem", color:result.tierColor, fontWeight:700, lineHeight:1 }}>{result.score}</div>
-            <div style={{ fontSize:"0.65rem", color:C.muted }}>out of 100</div>
-          </Ring>
-          <div style={{ flex:1 }}>
-            <div style={{ fontFamily:C.serif, fontSize:"2.2rem", color:result.tierColor, marginBottom:"8px" }}>{result.tierEmoji} {result.tier} Flora</div>
-            <div style={{ fontSize:"0.9rem", color:C.muted, lineHeight:1.8, maxWidth:"420px" }}>
-              {result.tier==="Thriving" && "Your gut is in excellent shape. Keep up your great habits — your microbiome is thriving."}
-              {result.tier==="Growing" && "Good foundations. A few targeted improvements can take your gut health to the next level."}
-              {result.tier==="Wilting" && "Your gut needs some attention. Small consistent changes create big results within weeks."}
-              {result.tier==="Struggling" && "Your gut is under stress. Start with the basics: water, sleep, and reducing processed foods."}
-            </div>
-            <div style={{ marginTop:"14px", display:"inline-flex", gap:"8px", flexWrap:"wrap" }}>
-              <span style={{ padding:"5px 12px", borderRadius:"50px", background:`${result.tierColor}15`, color:result.tierColor, fontSize:"0.78rem", fontWeight:600, border:`1px solid ${result.tierColor}30` }}>{result.scoredBy}</span>
-              <span style={{ padding:"5px 12px", borderRadius:"50px", background:`${result.dtResult.color}15`, color:result.dtResult.color, fontSize:"0.78rem", fontWeight:600, border:`1px solid ${result.dtResult.color}30` }}>🌲 DT: {result.dtResult.label}</span>
-              <span style={{ padding:"5px 12px", borderRadius:"50px", background:"rgba(255,255,255,0.05)", color:C.muted, fontSize:"0.78rem" }}>Confidence: {result.confidence}%</span>
-            </div>
-          </div>
-          <div style={{ flexShrink:0 }}>
-            <Btn onClick={onRetake} variant="outline" style={{ padding:"10px 20px", fontSize:"0.85rem" }}>↺ Retake Quiz</Btn>
-          </div>
-        </div>
-
-        <div className="fadeUp" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"14px", marginBottom:"32px", animationDelay:"0.1s" }}>
-          {Object.entries(result.catScores).map(([cat,score])=>(
-            <div key={cat} onClick={()=>setSection("analysis")} className="metric-card" style={{ background:C.card, border:`1px solid ${C.border2}`, borderRadius:"16px", padding:"20px", textAlign:"center", borderTop:`3px solid ${CAT_COLORS[cat]}` }}>
-              <div style={{ fontSize:"1.5rem", marginBottom:"8px" }}>{CAT_ICONS[cat]}</div>
-              <div style={{ fontFamily:C.serif, fontSize:"2rem", color:CAT_COLORS[cat], fontWeight:700 }}>{score}</div>
-              <div style={{ fontSize:"0.7rem", color:C.muted, textTransform:"uppercase", letterSpacing:"1.5px", margin:"4px 0 8px" }}>{cat}</div>
-              <Bar pct={score} color={CAT_COLORS[cat]} height="4px" />
-              <div style={{ fontSize:"0.72rem", color:C.muted, marginTop:"6px" }}>{score>=70?"Good":score>=50?"Fair":"Needs work"} →</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="fadeUp" style={{ animationDelay:"0.2s" }}>
-          <div style={{ fontSize:"0.65rem", letterSpacing:"2px", textTransform:"uppercase", color:C.muted, marginBottom:"16px" }}>Explore Your Health</div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"16px" }}>
-            {[
-              { key:"analysis",   icon:"📊", title:"My Analysis",    desc:"Biomarkers, clinical findings, microbiome composition and factor breakdown",  footer:"4 sections inside →" },
-              { key:"ml",         icon:"🤖", title:"ML Models",      desc:"XGBoost score vs Decision Tree risk — see how both models interpret your data", footer:null },
-              { key:"forecast",   icon:"🔮", title:"Future Outlook", desc:"Your gut health trajectory and 30-day action plan",                             footer:"3-horizon forecast →" },
-              { key:"checkin",    icon:"✅", title:"Daily Check-in", desc:"Log today's symptoms, stool type, water intake, sleep and stress",              footer:"Track today →" },
-              { key:"food",       icon:"🍽️", title:"Food Log",       desc:"Log meals, get instant gut-friendly vs trigger food feedback",                  footer:"Add meal →" },
-              { key:"microbiome", icon:"🔬", title:"My Microbiome",  desc:"Bacteria composition, diversity index and personalized insights",               footer:`${(result.d*10+4).toFixed(1)}/10 diversity →` },
-            ].map(card=>(
-              <div key={card.key} onClick={()=>setSection(card.key)} className="metric-card" style={{ background:C.card, border:`1px solid ${C.border2}`, borderRadius:"20px", padding:"24px", position:"relative", overflow:"hidden" }}>
-                <div style={{ position:"absolute", top:"-20px", right:"-20px", fontSize:"5rem", opacity:0.06 }}>{card.icon}</div>
-                <div style={{ fontSize:"2rem", marginBottom:"12px" }}>{card.icon}</div>
-                <div style={{ fontFamily:C.serif, fontSize:"1.2rem", color:C.text, marginBottom:"6px" }}>{card.title}</div>
-                <div style={{ fontSize:"0.78rem", color:C.muted, lineHeight:1.6, marginBottom:"14px" }}>{card.desc}</div>
-                {card.key==="ml" ? (
-                  <div style={{ display:"flex", gap:"6px" }}>
-                    <span style={{ padding:"3px 8px", borderRadius:"50px", background:`${result.tierColor}15`, color:result.tierColor, fontSize:"0.7rem" }}>XGB: {result.score}</span>
-                    <span style={{ padding:"3px 8px", borderRadius:"50px", background:`${result.dtResult.color}15`, color:result.dtResult.color, fontSize:"0.7rem" }}>DT: {result.dtResult.label}</span>
-                  </div>
-                ) : (
-                  <div style={{ fontSize:"0.72rem", color:card.key==="microbiome"?C.teal:C.green, fontWeight:600 }}>{card.footer}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {result.insights.length > 0 && (
-          <div className="fadeUp" style={{ marginTop:"32px", animationDelay:"0.3s" }}>
-            <div style={{ fontSize:"0.65rem", letterSpacing:"2px", textTransform:"uppercase", color:C.muted, marginBottom:"16px" }}>What Your Gut Is Telling You</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"12px" }}>
-              {result.insights.slice(0,4).map((ins,i)=><InsightCard key={i} {...ins} />)}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PageWrapper({ children, onRetake }) {
-  return (
-    <div style={{ minHeight:"100vh", background:C.bg, fontFamily:C.sans, color:C.text }}>
-      <style>{css}</style>
-      <div style={{ padding:"20px 32px", borderBottom:`1px solid ${C.border2}`, display:"flex", justifyContent:"space-between", alignItems:"center", background:C.surface, position:"sticky", top:0, zIndex:50 }}>
-        <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:C.green, fontWeight:700 }}>🌿 Flora</div>
-        <button onClick={onRetake} style={{ background:"none", border:`1px solid ${C.border2}`, borderRadius:"8px", padding:"6px 14px", color:C.muted, fontSize:"0.78rem", cursor:"pointer", fontFamily:C.sans }}>↺ Retake Quiz</button>
-      </div>
-      <div style={{ padding:"32px", maxWidth:"1100px", margin:"0 auto" }}>{children}</div>
-    </div>
-  );
-}
-
-// ─── ROOT APP ─────────────────────────────────────────────────────────
 function SectionArchetype({ result, answers, onBack }) {
   const [archetype, setArchetype] = useState(null);
-  const [loading, setLoading]     = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://flora-backend-uae5.onrender.com", {
+    fetch("https://flora-backend-uae5.onrender.com/api/archetype", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ answers })
@@ -1154,35 +968,21 @@ function SectionArchetype({ result, answers, onBack }) {
   return (
     <div className="slideIn">
       <BackBtn onClick={onBack} />
-      <h2 style={{ fontFamily:C.serif, fontSize:"2rem", color:C.green, marginBottom:"4px" }}>
-        🧬 Gut Archetype
-      </h2>
-      <p style={{ color:C.muted, fontSize:"0.85rem", marginBottom:"24px" }}>
-        K-Means clustering identifies your gut health pattern — inspired by Ultrahuman
-      </p>
-
+      <h2 style={{ fontFamily:C.serif, fontSize:"2rem", color:C.green, marginBottom:"4px" }}>🧬 Gut Archetype</h2>
+      <p style={{ color:C.muted, fontSize:"0.85rem", marginBottom:"24px" }}>K-Means clustering identifies your gut health pattern — inspired by Ultrahuman</p>
       {loading ? (
         <div style={{ color:C.muted, textAlign:"center", padding:"40px" }}>Analysing your pattern...</div>
       ) : archetype ? (
         <>
           <div style={{ padding:"28px", borderRadius:"18px", border:`2px solid ${archetype.color}40`, background:`${archetype.color}08`, textAlign:"center", marginBottom:"24px" }}>
             <div style={{ fontSize:"4rem", marginBottom:"12px" }}>{archetype.emoji}</div>
-            <div style={{ fontFamily:C.serif, fontSize:"2rem", color:archetype.color, fontWeight:700, marginBottom:"8px" }}>
-              {archetype.name}
-            </div>
-            <div style={{ fontSize:"0.88rem", color:C.muted, lineHeight:1.7, maxWidth:"300px", margin:"0 auto 16px" }}>
-              {archetype.desc}
-            </div>
-            <div style={{ fontSize:"0.78rem", color:archetype.color }}>
-              Pattern confidence: {archetype.confidence}%
-            </div>
+            <div style={{ fontFamily:C.serif, fontSize:"2rem", color:archetype.color, fontWeight:700, marginBottom:"8px" }}>{archetype.name}</div>
+            <div style={{ fontSize:"0.88rem", color:C.muted, lineHeight:1.7, maxWidth:"300px", margin:"0 auto 16px" }}>{archetype.desc}</div>
+            <div style={{ fontSize:"0.78rem", color:archetype.color }}>Pattern confidence: {archetype.confidence}%</div>
           </div>
-
           <div style={{ padding:"16px 20px", borderRadius:"14px", background:"rgba(255,255,255,0.03)", border:`1px solid ${C.border2}` }}>
             <div style={{ fontSize:"0.8rem", color:C.muted, marginBottom:"10px", fontWeight:600 }}>HOW K-MEANS WORKS</div>
-            <div style={{ fontSize:"0.82rem", color:C.text, lineHeight:1.7 }}>
-              K-Means grouped 5,000 gut health profiles into 4 clusters. Your 25 answers were matched to the nearest cluster centroid — giving you a lifestyle archetype instead of just a number score.
-            </div>
+            <div style={{ fontSize:"0.82rem", color:C.text, lineHeight:1.7 }}>K-Means grouped 5,000 gut health profiles into 4 clusters. Your 25 answers were matched to the nearest cluster centroid — giving you a lifestyle archetype instead of just a number score.</div>
           </div>
         </>
       ) : (
@@ -1191,6 +991,181 @@ function SectionArchetype({ result, answers, onBack }) {
     </div>
   );
 }
+
+// ─── PAGE WRAPPER ─────────────────────────────────────────────────────
+function PageWrapper({ children, onRetake }) {
+  return (
+    <div style={{ minHeight:"100vh", background:C.bg, maxWidth:"480px", margin:"0 auto", padding:"24px 16px 100px" }}>
+      <style>{css}</style>
+      {children}
+      <div style={{ marginTop:"24px" }}>
+        <button onClick={onRetake} style={{ background:"none", border:"none", color:C.muted, fontSize:"0.8rem", cursor:"pointer", fontFamily:C.sans }}>
+          ← Retake Quiz
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────
+function Dashboard({ user, answers, onRetake }) {
+  const [section, setSection] = useState(null);
+  const [activeTab, setActiveTab] = useState("home");
+  const result = answers && Object.keys(answers).length > 0 ? analyze(answers) : null;
+
+  const NAV = [
+    { id:"home",     icon:"🏠", label:"Home" },
+    { id:"analysis", icon:"📊", label:"Analysis" },
+    { id:"checkin",  icon:"📅", label:"Check-in" },
+    { id:"profile",  icon:"👤", label:"Profile" },
+  ];
+
+  if (section === "analysis")   return <PageWrapper onRetake={onRetake}><SectionAnalysis result={result} answers={answers} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "ml")         return <PageWrapper onRetake={onRetake}><SectionMLModels result={result} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "forecast")   return <PageWrapper onRetake={onRetake}><SectionForecast result={result} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "checkin")    return <PageWrapper onRetake={onRetake}><SectionCheckin user={user} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "food")       return <PageWrapper onRetake={onRetake}><SectionFoodLog user={user} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "microbiome") return <PageWrapper onRetake={onRetake}><SectionMicrobiome result={result} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "archetype")  return <PageWrapper onRetake={onRetake}><SectionArchetype result={result} answers={answers} onBack={()=>setSection(null)} /></PageWrapper>;
+
+  const renderTab = () => {
+    if (activeTab === "home") return (
+      <div className="fadeUp" style={{ padding:"20px 16px 100px" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"24px" }}>
+          <div>
+            <div style={{ fontSize:"0.78rem", color:C.muted }}>Good day,</div>
+            <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:C.green }}>{user?.name || "Guest"} 🌿</div>
+          </div>
+          <div style={{ width:"42px", height:"42px", borderRadius:"50%", background:C.greenDim, border:`1px solid ${C.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.2rem" }}>
+            {user?.name?.[0] || "G"}
+          </div>
+        </div>
+        {result && (
+          <div style={{ textAlign:"center", marginBottom:"28px", padding:"28px 20px", background:C.card, borderRadius:"20px", border:`1px solid ${C.border}` }}>
+            <Ring pct={result.score} color={result.tierColor} size={140}>
+              <div style={{ fontFamily:C.serif, fontSize:"2.5rem", color:result.tierColor, fontWeight:700 }}>{result.score}</div>
+              <div style={{ fontSize:"0.65rem", color:C.muted }}>/100</div>
+            </Ring>
+            <div style={{ fontFamily:C.serif, fontSize:"1.3rem", color:result.tierColor, marginTop:"12px" }}>{result.tierEmoji} {result.tier}</div>
+            <div style={{ fontSize:"0.78rem", color:C.muted, marginTop:"4px" }}>Gut Health Score</div>
+          </div>
+        )}
+        {result && (
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"12px", marginBottom:"24px" }}>
+            {Object.entries(result.catScores).map(([cat, score]) => (
+              <div key={cat} className="metric-card" style={{ padding:"16px", background:C.card, borderRadius:"16px", border:`1px solid ${C.border2}` }}>
+                <div style={{ fontSize:"1.2rem", marginBottom:"6px" }}>{CAT_ICONS[cat]}</div>
+                <div style={{ fontSize:"0.75rem", color:C.muted, marginBottom:"4px" }}>{cat}</div>
+                <div style={{ fontFamily:C.serif, fontSize:"1.5rem", color:CAT_COLORS[cat] }}>{score}</div>
+                <Bar pct={score} color={CAT_COLORS[cat]} height="3px" delay="0s" />
+              </div>
+            ))}
+          </div>
+        )}
+        <div style={{ marginBottom:"16px" }}>
+          <div style={{ fontSize:"0.78rem", color:C.muted, marginBottom:"12px", fontWeight:600, letterSpacing:"0.05em" }}>QUICK ACTIONS</div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
+            {[
+              { icon:"🤖", label:"ML Models",  key:"ml" },
+              { icon:"🔮", label:"Forecast",   key:"forecast" },
+              { icon:"🧬", label:"Microbiome", key:"microbiome" },
+              { icon:"🍎", label:"Food Log",   key:"food" },
+            ].map(a => (
+              <div key={a.key} className="metric-card" onClick={()=>setSection(a.key)}
+                style={{ padding:"14px 16px", background:C.card, borderRadius:"14px", border:`1px solid ${C.border2}`, cursor:"pointer", display:"flex", alignItems:"center", gap:"10px" }}>
+                <span style={{ fontSize:"1.3rem" }}>{a.icon}</span>
+                <span style={{ fontSize:"0.82rem", color:C.text }}>{a.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+
+    if (activeTab === "analysis") return (
+      <div className="fadeUp" style={{ padding:"20px 16px 100px" }}>
+        <h2 style={{ fontFamily:C.serif, fontSize:"2rem", color:C.green, marginBottom:"20px" }}>📊 Analysis</h2>
+        <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+          {[
+            { icon:"🔬", label:"Deep Analysis",  sub:"XGBoost feature breakdown",  key:"analysis" },
+            { icon:"🤖", label:"ML Models",       sub:"XGBoost vs Decision Tree",   key:"ml" },
+            { icon:"🔮", label:"Future Forecast", sub:"1, 3 & 6 month projections", key:"forecast" },
+            { icon:"🧬", label:"My Microbiome",   sub:"Bacterial composition",      key:"microbiome" },
+            { icon:"🎯", label:"Gut Archetype",   sub:"K-Means cluster profile",    key:"archetype" },
+          ].map(a => (
+            <div key={a.key} className="metric-card" onClick={()=>setSection(a.key)}
+              style={{ padding:"16px 20px", background:C.card, borderRadius:"16px", border:`1px solid ${C.border2}`, cursor:"pointer", display:"flex", alignItems:"center", gap:"16px" }}>
+              <span style={{ fontSize:"1.8rem" }}>{a.icon}</span>
+              <div>
+                <div style={{ fontSize:"0.9rem", color:C.text, fontWeight:600 }}>{a.label}</div>
+                <div style={{ fontSize:"0.75rem", color:C.muted }}>{a.sub}</div>
+              </div>
+              <div style={{ marginLeft:"auto", color:C.muted }}>›</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+    if (activeTab === "checkin") return (
+      <div className="fadeUp" style={{ padding:"20px 16px 100px" }}>
+        <SectionCheckin user={user} onBack={()=>setActiveTab("home")} />
+      </div>
+    );
+
+    if (activeTab === "profile") return (
+      <div className="fadeUp" style={{ padding:"20px 16px 100px" }}>
+        <h2 style={{ fontFamily:C.serif, fontSize:"2rem", color:C.green, marginBottom:"20px" }}>👤 Profile</h2>
+        <div style={{ padding:"24px", background:C.card, borderRadius:"20px", border:`1px solid ${C.border}`, marginBottom:"16px", textAlign:"center" }}>
+          <div style={{ width:"64px", height:"64px", borderRadius:"50%", background:C.greenDim, border:`2px solid ${C.green}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem", margin:"0 auto 12px" }}>
+            {user?.name?.[0] || "G"}
+          </div>
+          <div style={{ fontFamily:C.serif, fontSize:"1.4rem", color:C.text }}>{user?.name || "Guest"}</div>
+          <div style={{ fontSize:"0.8rem", color:C.muted }}>{user?.email || "No account"}</div>
+          {result && <div style={{ marginTop:"12px", fontSize:"1rem", color:result.tierColor }}>{result.tierEmoji} {result.tier}</div>}
+        </div>
+        {result && (
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"12px", marginBottom:"16px" }}>
+            {Object.entries(result.catScores).map(([cat,score])=>(
+              <div key={cat} style={{ padding:"16px", background:C.card, borderRadius:"14px", border:`1px solid ${C.border2}` }}>
+                <div style={{ fontSize:"0.75rem", color:C.muted, marginBottom:"4px" }}>{CAT_ICONS[cat]} {cat}</div>
+                <div style={{ fontFamily:C.serif, fontSize:"1.5rem", color:CAT_COLORS[cat] }}>{score}</div>
+                <Bar pct={score} color={CAT_COLORS[cat]} height="3px" delay="0s" />
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="metric-card" onClick={onRetake}
+          style={{ padding:"16px 20px", background:C.card, borderRadius:"16px", border:`1px solid ${C.border2}`, cursor:"pointer", display:"flex", alignItems:"center", gap:"12px" }}>
+          <span style={{ fontSize:"1.5rem" }}>🔄</span>
+          <div>
+            <div style={{ fontSize:"0.9rem", color:C.text }}>Retake Assessment</div>
+            <div style={{ fontSize:"0.75rem", color:C.muted }}>Update your gut health quiz</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:C.bg, maxWidth:"480px", margin:"0 auto", position:"relative" }}>
+      <style>{css}</style>
+      {renderTab()}
+      <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", maxWidth:"480px", background:"rgba(5,12,7,0.95)", backdropFilter:"blur(20px)", borderTop:`1px solid ${C.border}`, display:"flex", zIndex:100 }}>
+        {NAV.map(tab => (
+          <div key={tab.id} onClick={()=>setActiveTab(tab.id)}
+            style={{ flex:1, padding:"12px 0", display:"flex", flexDirection:"column", alignItems:"center", gap:"4px", cursor:"pointer", transition:"all 0.2s" }}>
+            <span style={{ fontSize:"1.4rem", filter:activeTab===tab.id?"none":"grayscale(1) opacity(0.5)" }}>{tab.icon}</span>
+            <span style={{ fontSize:"0.65rem", color:activeTab===tab.id?C.green:C.muted, fontWeight:activeTab===tab.id?600:400 }}>{tab.label}</span>
+            {activeTab===tab.id && <div style={{ width:"4px", height:"4px", borderRadius:"50%", background:C.green }} />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── ROOT APP ─────────────────────────────────────────────────────────
 export default function FloraApp() {
   const [screen, setScreen] = useState("auth");
   const [user, setUser] = useState(null);

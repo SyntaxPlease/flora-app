@@ -1754,7 +1754,215 @@ function SectionMicrobiome({ result, onBack }) {
   );
 }
 
+<<<<<<< HEAD
 // eslint-disable-next-line no-unused-vars
+=======
+// ─── DASHBOARD ───────────────────────────────────────────────────────
+function Dashboard({ user, answers, onRetake }) {
+  const [section, setSection] = useState(null);
+  const [apiResult, setApiResult] = useState(null);
+  const [apiLoading, setApiLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
+
+  useEffect(() => {
+    async function fetchAssess() {
+      if (!answers || Object.keys(answers).length === 0) {
+        setApiError("No quiz answers available. Please take the quiz first.");
+        setApiResult(null);
+        setApiLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:8000/api/assess", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: user.id, answers: answers }),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Backend returned ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // Normalize backend shape for the UI.
+        const normalizedCatScores = {
+          Diet: data?.category_scores?.diet,
+          Medication: data?.category_scores?.medication,
+          Symptoms: data?.category_scores?.symptoms,
+          Lifestyle: data?.category_scores?.lifestyle,
+        };
+
+        setApiResult({
+          score: data?.xgboost?.score100,
+          confidence: data?.xgboost?.confidence,
+          importance: data?.xgboost?.importance,
+          catScores: normalizedCatScores,
+        });
+      } catch (e) {
+        setApiError(e.message);
+        setApiResult(null);
+      }
+      setApiLoading(false);
+    }
+    fetchAssess();
+  }, []);
+
+  const jsResult = analyze(answers);
+
+  const result = apiResult
+    ? {
+        ...jsResult,
+        score:      apiResult.score      ?? jsResult.score,
+        catScores:  {
+          Diet: apiResult.catScores?.Diet ?? jsResult.catScores.Diet,
+          Medication: apiResult.catScores?.Medication ?? jsResult.catScores.Medication,
+          Symptoms: apiResult.catScores?.Symptoms ?? jsResult.catScores.Symptoms,
+          Lifestyle: apiResult.catScores?.Lifestyle ?? jsResult.catScores.Lifestyle,
+        },
+        d:          jsResult.d,
+        confidence: apiResult.confidence ?? jsResult.confidence,
+        importance: apiResult.importance ?? jsResult.importance,
+        tier:       apiResult.score >= 75 ? "Thriving" : apiResult.score >= 55 ? "Growing" : apiResult.score >= 35 ? "Wilting" : "Struggling",
+        tierEmoji:  apiResult.score >= 75 ? "🌸" : apiResult.score >= 55 ? "🌿" : apiResult.score >= 35 ? "🌾" : "🥀",
+        tierColor:  apiResult.score >= 75 ? C.green : apiResult.score >= 55 ? C.lime : apiResult.score >= 35 ? C.yellow : C.red,
+        scoredBy:   "XGBoost (backend)",
+      }
+    : { ...jsResult, scoredBy: "Rule-based (offline)" };
+
+  if (apiLoading) {
+    return (
+      <div style={{ minHeight:"100vh", background:C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:"20px" }}>
+        <style>{css}</style>
+        <div style={{ fontSize:"3rem" }} className="float">🌿</div>
+        <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:C.green }}>Analysing your gut health…</div>
+        <div style={{ fontSize:"0.85rem", color:C.muted }}>Running K-Means Clustering+XGBoost + Decision Tree models</div>
+        <div style={{ display:"flex", gap:"6px" }}>{[0,1,2].map(j=>(<div key={j} style={{ width:"10px", height:"10px", borderRadius:"50%", background:C.green, animation:`typing 1.2s ${j*0.2}s infinite` }} />))}</div>
+      </div>
+    );
+  }
+
+  if (section === "analysis")   return <PageWrapper onRetake={onRetake}><SectionAnalysis result={result} answers={answers} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "ml")         return <PageWrapper onRetake={onRetake}><SectionMLModels result={result} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "forecast")   return <PageWrapper onRetake={onRetake}><SectionForecast result={result} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "checkin")    return <PageWrapper onRetake={onRetake}><SectionCheckin user={user} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "food")       return <PageWrapper onRetake={onRetake}><SectionFoodLog user={user} onBack={()=>setSection(null)} /></PageWrapper>;
+  if (section === "microbiome") return <PageWrapper onRetake={onRetake}><SectionMicrobiome result={result} onBack={()=>setSection(null)} /></PageWrapper>;
+if (section === "archetype") return <PageWrapper onRetake={onRetake}><SectionArchetype result={result} answers={answers} onBack={()=>setSection(null)} /></PageWrapper>;
+
+  return (
+    <div style={{ minHeight:"100vh", background:C.bg, fontFamily:C.sans, color:C.text }}>
+      <style>{css}</style>
+      <div style={{ padding:"20px 32px", borderBottom:`1px solid ${C.border2}`, display:"flex", justifyContent:"space-between", alignItems:"center", background:C.surface, position:"sticky", top:0, zIndex:50 }}>
+        <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:C.green, fontWeight:700 }}>🌿 Flora</div>
+        <div style={{ display:"flex", gap:"8px", alignItems:"center" }}>
+          {/* Show backend status */}
+          {apiError && (
+            <span style={{ fontSize:"0.72rem", color:C.yellow, background:`${C.yellow}15`, border:`1px solid ${C.yellow}30`, padding:"4px 10px", borderRadius:"50px" }}>
+              ⚠️ Offline mode — {apiError}
+            </span>
+          )}
+          <span style={{ fontSize:"0.85rem", color:C.muted }}>Hi, {user.name}</span>
+          <div style={{ width:"32px", height:"32px", borderRadius:"50%", background:`linear-gradient(135deg,${C.green},${C.teal})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.9rem" }}>👤</div>
+        </div>
+      </div>
+
+      <div style={{ padding:"32px", maxWidth:"1100px", margin:"0 auto" }}>
+        <div className="fadeUp" style={{ display:"flex", gap:"32px", alignItems:"center", marginBottom:"40px", padding:"32px", background:`linear-gradient(135deg,rgba(74,222,128,0.07),rgba(45,212,191,0.04))`, border:C.border, borderWidth:1, borderStyle:"solid", borderRadius:"24px" }}>
+          <Ring pct={result.score} color={result.tierColor} size={180} strokeWidth={14}>
+            <div style={{ fontFamily:C.serif, fontSize:"2.8rem", color:result.tierColor, fontWeight:700, lineHeight:1 }}>{result.score}</div>
+            <div style={{ fontSize:"0.65rem", color:C.muted }}>out of 100</div>
+          </Ring>
+          <div style={{ flex:1 }}>
+            <div style={{ fontFamily:C.serif, fontSize:"2.2rem", color:result.tierColor, marginBottom:"8px" }}>{result.tierEmoji} {result.tier} Flora</div>
+            <div style={{ fontSize:"0.9rem", color:C.muted, lineHeight:1.8, maxWidth:"420px" }}>
+              {result.tier==="Thriving" && "Your gut is in excellent shape. Keep up your great habits — your microbiome is thriving."}
+              {result.tier==="Growing" && "Good foundations. A few targeted improvements can take your gut health to the next level."}
+              {result.tier==="Wilting" && "Your gut needs some attention. Small consistent changes create big results within weeks."}
+              {result.tier==="Struggling" && "Your gut is under stress. Start with the basics: water, sleep, and reducing processed foods."}
+            </div>
+            <div style={{ marginTop:"14px", display:"inline-flex", gap:"8px", flexWrap:"wrap" }}>
+              <span style={{ padding:"5px 12px", borderRadius:"50px", background:`${result.tierColor}15`, color:result.tierColor, fontSize:"0.78rem", fontWeight:600, border:`1px solid ${result.tierColor}30` }}>{result.scoredBy}</span>
+              <span style={{ padding:"5px 12px", borderRadius:"50px", background:`${result.dtResult.color}15`, color:result.dtResult.color, fontSize:"0.78rem", fontWeight:600, border:`1px solid ${result.dtResult.color}30` }}>🌲 DT: {result.dtResult.label}</span>
+              <span style={{ padding:"5px 12px", borderRadius:"50px", background:"rgba(255,255,255,0.05)", color:C.muted, fontSize:"0.78rem" }}>Confidence: {result.confidence}%</span>
+            </div>
+          </div>
+          <div style={{ flexShrink:0 }}>
+            <Btn onClick={onRetake} variant="outline" style={{ padding:"10px 20px", fontSize:"0.85rem" }}>↺ Retake Quiz</Btn>
+          </div>
+        </div>
+
+        <div className="fadeUp" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"14px", marginBottom:"32px", animationDelay:"0.1s" }}>
+          {Object.entries(result.catScores).map(([cat,score])=>(
+            <div key={cat} onClick={()=>setSection("analysis")} className="metric-card" style={{ background:C.card, border:`1px solid ${C.border2}`, borderRadius:"16px", padding:"20px", textAlign:"center", borderTop:`3px solid ${CAT_COLORS[cat]}` }}>
+              <div style={{ fontSize:"1.5rem", marginBottom:"8px" }}>{CAT_ICONS[cat]}</div>
+              <div style={{ fontFamily:C.serif, fontSize:"2rem", color:CAT_COLORS[cat], fontWeight:700 }}>{score}</div>
+              <div style={{ fontSize:"0.7rem", color:C.muted, textTransform:"uppercase", letterSpacing:"1.5px", margin:"4px 0 8px" }}>{cat}</div>
+              <Bar pct={score} color={CAT_COLORS[cat]} height="4px" />
+              <div style={{ fontSize:"0.72rem", color:C.muted, marginTop:"6px" }}>{score>=70?"Good":score>=50?"Fair":"Needs work"} →</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="fadeUp" style={{ animationDelay:"0.2s" }}>
+          <div style={{ fontSize:"0.65rem", letterSpacing:"2px", textTransform:"uppercase", color:C.muted, marginBottom:"16px" }}>Explore Your Health</div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"16px" }}>
+            {[
+              { key:"analysis",   icon:"📊", title:"My Analysis",    desc:"Biomarkers, clinical findings, microbiome composition and factor breakdown",  footer:"4 sections inside →" },
+              { key:"ml",         icon:"🤖", title:"ML Models",      desc:"XGBoost score vs Decision Tree risk — see how both models interpret your data", footer:null },
+              { key:"forecast",   icon:"🔮", title:"Future Outlook", desc:"Your gut health trajectory and 30-day action plan",                             footer:"3-horizon forecast →" },
+              { key:"checkin",    icon:"✅", title:"Daily Check-in", desc:"Log today's symptoms, stool type, water intake, sleep and stress",              footer:"Track today →" },
+              { key:"food",       icon:"🍽️", title:"Food Log",       desc:"Log meals, get instant gut-friendly vs trigger food feedback",                  footer:"Add meal →" },
+              { key:"microbiome", icon:"🔬", title:"My Microbiome",  desc:"Bacteria composition, diversity index and personalized insights",               footer:`${(result.d*10+4).toFixed(1)}/10 diversity →` },
+            ].map(card=>(
+              <div key={card.key} onClick={()=>setSection(card.key)} className="metric-card" style={{ background:C.card, border:`1px solid ${C.border2}`, borderRadius:"20px", padding:"24px", position:"relative", overflow:"hidden" }}>
+                <div style={{ position:"absolute", top:"-20px", right:"-20px", fontSize:"5rem", opacity:0.06 }}>{card.icon}</div>
+                <div style={{ fontSize:"2rem", marginBottom:"12px" }}>{card.icon}</div>
+                <div style={{ fontFamily:C.serif, fontSize:"1.2rem", color:C.text, marginBottom:"6px" }}>{card.title}</div>
+                <div style={{ fontSize:"0.78rem", color:C.muted, lineHeight:1.6, marginBottom:"14px" }}>{card.desc}</div>
+                {card.key==="ml" ? (
+                  <div style={{ display:"flex", gap:"6px" }}>
+                    <span style={{ padding:"3px 8px", borderRadius:"50px", background:`${result.tierColor}15`, color:result.tierColor, fontSize:"0.7rem" }}>XGB: {result.score}</span>
+                    <span style={{ padding:"3px 8px", borderRadius:"50px", background:`${result.dtResult.color}15`, color:result.dtResult.color, fontSize:"0.7rem" }}>DT: {result.dtResult.label}</span>
+                  </div>
+                ) : (
+                  <div style={{ fontSize:"0.72rem", color:card.key==="microbiome"?C.teal:C.green, fontWeight:600 }}>{card.footer}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {result.insights.length > 0 && (
+          <div className="fadeUp" style={{ marginTop:"32px", animationDelay:"0.3s" }}>
+            <div style={{ fontSize:"0.65rem", letterSpacing:"2px", textTransform:"uppercase", color:C.muted, marginBottom:"16px" }}>What Your Gut Is Telling You</div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"12px" }}>
+              {result.insights.slice(0,4).map((ins,i)=><InsightCard key={i} {...ins} />)}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PageWrapper({ children, onRetake }) {
+  return (
+    <div style={{ minHeight:"100vh", background:C.bg, fontFamily:C.sans, color:C.text }}>
+      <style>{css}</style>
+      <div style={{ padding:"20px 32px", borderBottom:`1px solid ${C.border2}`, display:"flex", justifyContent:"space-between", alignItems:"center", background:C.surface, position:"sticky", top:0, zIndex:50 }}>
+        <div style={{ fontFamily:C.serif, fontSize:"1.6rem", color:C.green, fontWeight:700 }}>🌿 Flora</div>
+        <button onClick={onRetake} style={{ background:"none", border:`1px solid ${C.border2}`, borderRadius:"8px", padding:"6px 14px", color:C.muted, fontSize:"0.78rem", cursor:"pointer", fontFamily:C.sans }}>↺ Retake Quiz</button>
+      </div>
+      <div style={{ padding:"32px", maxWidth:"1100px", margin:"0 auto" }}>{children}</div>
+    </div>
+  );
+}
+
+// ─── ROOT APP ─────────────────────────────────────────────────────────
+>>>>>>> 5839047b78a4bc1d9404b9f1f20e392715776ad6
 function SectionArchetype({ result, answers, onBack }) {
   const [archetype, setArchetype] = useState(null);
   const [loading, setLoading] = useState(true);

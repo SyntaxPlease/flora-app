@@ -1,0 +1,31 @@
+<svg width="320" height="220" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="foodBg" x1="30" y1="24" x2="292" y2="196" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#182A1B"/>
+      <stop offset="1" stop-color="#0C120E"/>
+    </linearGradient>
+    <linearGradient id="bowl" x1="84" y1="118" x2="236" y2="158" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#4ADE80"/>
+    </linearGradient>
+  </defs>
+  <rect x="18" y="16" width="284" height="188" rx="28" fill="url(#foodBg)"/>
+  <rect x="182" y="36" width="90" height="64" rx="18" fill="#0F1E12" stroke="#4ADE80" stroke-opacity="0.2"/>
+  <path d="M198 84C210 73 220 79 231 73C241 67 247 56 256 49" stroke="#86EFAC" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="198" cy="84" r="5" fill="#86EFAC"/>
+  <circle cx="231" cy="73" r="5" fill="#4ADE80"/>
+  <circle cx="256" cy="49" r="5" fill="#F0FDF4"/>
+  <path d="M90 122C90 102 106 86 126 86H194C214 86 230 102 230 122V124H90V122Z" fill="url(#bowl)"/>
+  <path d="M98 126H222C218 148 200 164 178 164H142C120 164 102 148 98 126Z" fill="#FFF7ED" fill-opacity="0.92"/>
+  <circle cx="122" cy="104" r="14" fill="#4ADE80"/>
+  <circle cx="152" cy="96" r="13" fill="#FACC15"/>
+  <circle cx="182" cy="106" r="12" fill="#FB923C"/>
+  <circle cx="204" cy="94" r="9" fill="#2DD4BF"/>
+  <path d="M128 54C128 44 136 36 146 36C156 36 164 44 164 54V82H128V54Z" fill="#0F1E12" stroke="#F0FDF4" stroke-opacity="0.14"/>
+  <path d="M142 36V82" stroke="#F0FDF4" stroke-opacity="0.16"/>
+  <path d="M150 36V82" stroke="#F0FDF4" stroke-opacity="0.16"/>
+  <path d="M158 36V82" stroke="#F0FDF4" stroke-opacity="0.16"/>
+  <rect x="52" y="176" width="72" height="10" rx="5" fill="#F0FDF4" fill-opacity="0.14"/>
+  <rect x="132" y="176" width="54" height="10" rx="5" fill="#4ADE80" fill-opacity="0.22"/>
+  <rect x="194" y="176" width="40" height="10" rx="5" fill="#F59E0B" fill-opacity="0.22"/>
+</svg>

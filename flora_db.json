@@ -1,0 +1,129 @@
+{
+  "users": {
+    "29560be3-8d72-4f66-b3ae-514fd3b1db10": {
+      "id": "29560be3-8d72-4f66-b3ae-514fd3b1db10",
+      "name": "Nibraas",
+      "email": "nibraasagasimani@gmail.com",
+      "password": "899653d12b9c83614203de141fd2bab21f77a3bb6b399521aa74adef9883b2e1",
+      "profile": {},
+      "created_at": "2026-04-06T17:59:47.189318",
+      "assessments": [
+        "d5a28afb-944e-4c2d-92b1-a0dd33a05a55"
+      ]
+    }
+  },
+  "history": [
+    {
+      "id": "d5a28afb-944e-4c2d-92b1-a0dd33a05a55",
+      "user_id": "29560be3-8d72-4f66-b3ae-514fd3b1db10",
+      "timestamp": "2026-04-06T18:00:26.124585",
+      "answers": {
+        "fruits_veggies": 3,
+        "junk_food": 2,
+        "fermented": 3,
+        "water": 2,
+        "fiber": 2,
+        "sugar": 2,
+        "plant_diversity": 3,
+        "meal_timing": 2,
+        "alcohol": 2,
+        "antibiotics": 1,
+        "probiotics": -1,
+        "bloating": -3,
+        "acidity": -3,
+        "bristol": -3,
+        "bowel_freq": -2,
+        "fatigue": -3,
+        "skin": -2,
+        "food_intol": -3,
+        "nausea": -3,
+        "stress": -2,
+        "sleep": -1,
+        "exercise": -1,
+        "smoking": 2,
+        "mindful_eating": 1,
+        "outdoor_time": 1
+      },
+      "quiz_score": -1,
+      "tier": "Dysbiosis Alert",
+      "xgboost_score": 58,
+      "confidence": 95,
+      "feature_importance": [
+        {
+          "key": "fruits_veggies",
+          "weight": 18,
+          "normalized": 1.0
+        },
+        {
+          "key": "junk_food",
+          "weight": 15,
+          "normalized": 1.0
+        },
+        {
+          "key": "fermented",
+          "weight": 14,
+          "normalized": 1.0
+        },
+        {
+          "key": "fiber",
+          "weight": 13,
+          "normalized": 1.0
+        },
+        {
+          "key": "bristol",
+          "weight": 13,
+          "normalized": 0.0
+        },
+        {
+          "key": "water",
+          "weight": 12,
+          "normalized": 1.0
+        },
+        {
+          "key": "sleep",
+          "weight": 12,
+          "normalized": 0.4
+        },
+        {
+          "key": "bloating",
+          "weight": 11,
+          "normalized": 0.0
+        },
+        {
+          "key": "antibiotics",
+          "weight": 10,
+          "normalized": 1.0
+        },
+        {
+          "key": "stress",
+          "weight": 10,
+          "normalized": 0.2
+        },
+        {
+          "key": "probiotics",
+          "weight": 9,
+          "normalized": 0.0
+        },
+        {
+          "key": "exercise",
+          "weight": 9,
+          "normalized": 0.25
+        },
+        {
+          "key": "acidity",
+          "weight": 8,
+          "normalized": 0.0
+        }
+      ],
+      "category_scores": {
+        "diet": 98,
+        "medication": 55,
+        "symptoms": 0,
+        "lifestyle": 28
+      },
+      "checkin": {}
+    }
+  ],
+  "checkins": [],
+  "food_log": []
+}

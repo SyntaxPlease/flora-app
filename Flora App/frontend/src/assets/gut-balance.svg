@@ -1,0 +1,25 @@
+<svg width="320" height="220" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gutBg" x1="30" y1="22" x2="292" y2="196" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12281F"/>
+      <stop offset="1" stop-color="#09110C"/>
+    </linearGradient>
+    <linearGradient id="gutGlow" x1="101" y1="61" x2="218" y2="166" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#4ADE80"/>
+    </linearGradient>
+  </defs>
+  <rect x="18" y="16" width="284" height="188" rx="28" fill="url(#gutBg)"/>
+  <circle cx="76" cy="58" r="28" fill="#2DD4BF" fill-opacity="0.08"/>
+  <circle cx="250" cy="160" r="30" fill="#4ADE80" fill-opacity="0.08"/>
+  <path d="M111 62C91 74 80 94 80 118C80 148 102 173 130 173H190C218 173 240 148 240 118C240 94 229 74 209 62" stroke="#F0FDF4" stroke-opacity="0.22" stroke-width="10" stroke-linecap="round"/>
+  <path d="M124 86C106 92 99 111 106 127C113 142 131 149 148 143C161 138 170 124 167 109C165 97 154 88 141 88C128 88 118 98 118 110C118 122 128 131 139 131" stroke="url(#gutGlow)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M196 86C214 92 221 111 214 127C207 142 189 149 172 143C159 138 150 124 153 109C155 97 166 88 179 88C192 88 202 98 202 110C202 122 192 131 181 131" stroke="url(#gutGlow)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="48" y="38" width="84" height="42" rx="16" fill="#0F1E12" stroke="#2DD4BF" stroke-opacity="0.2"/>
+  <rect x="60" y="50" width="32" height="8" rx="4" fill="#F0FDF4" fill-opacity="0.9"/>
+  <rect x="60" y="64" width="52" height="6" rx="3" fill="#2DD4BF" fill-opacity="0.5"/>
+  <rect x="200" y="42" width="60" height="14" rx="7" fill="#4ADE80" fill-opacity="0.22"/>
+  <rect x="200" y="64" width="42" height="10" rx="5" fill="#2DD4BF" fill-opacity="0.18"/>
+  <rect x="62" y="182" width="58" height="8" rx="4" fill="#4ADE80" fill-opacity="0.28"/>
+  <rect x="128" y="182" width="96" height="8" rx="4" fill="#2DD4BF" fill-opacity="0.18"/>
+</svg>

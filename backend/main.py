@@ -8,30 +8,43 @@ import hashlib
 import json
 import os
 import math
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+DB_FILE = Path(os.getenv("DB_FILE", BASE_DIR / "flora_db.json"))
+DEFAULT_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+ENV_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 app = FastAPI(title="Flora API v2.0 — XGBoost Edition")
 
 # ── CORS ──────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000",
-                   "http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=DEFAULT_ORIGINS + ENV_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # ── FILE DATABASE ─────────────────────────────────────────────────
-DB_FILE = "flora_db.json"
-
 def load_db():
-    if not os.path.exists(DB_FILE):
+    if not DB_FILE.exists():
         return {"users": {}, "history": [], "checkins": [], "food_log": []}
-    with open(DB_FILE, "r") as f:
+    with DB_FILE.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 def save_db(db):
-    with open(DB_FILE, "w") as f:
+    DB_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with DB_FILE.open("w", encoding="utf-8") as f:
         json.dump(db, f, indent=2)
 
 def hash_password(pw: str) -> str:
@@ -135,6 +148,10 @@ class LoginRequest(BaseModel):
     email:    str
     password: str
 
+class ClaimGuestDataRequest(BaseModel):
+    guest_user_id: str
+    new_user_id: str
+
 class UpdateProfileRequest(BaseModel):
     user_id:        str
     name:           Optional[str]   = None
@@ -154,6 +171,9 @@ class AssessRequest(BaseModel):
     answers: Dict[str, int] = {}
     checkin: Optional[dict] = {}
 
+class ArchetypeRequest(BaseModel):
+    answers: Dict[str, int] = {}
+
 class CheckinRequest(BaseModel):
     user_id:   Optional[str]   = None
     bristol:   Optional[int]   = 4
@@ -171,6 +191,68 @@ class CheckinRequest(BaseModel):
 class FoodLogRequest(BaseModel):
     user_id: Optional[str] = None
     food:    str
+
+
+ARCHETYPE_LABELS = {
+    "gut_champion": {
+        "cluster_id": 0,
+        "name": "Gut Champion",
+        "emoji": "🌸",
+        "color": "#4ade80",
+        "desc": "High diet quality, good sleep and low symptom load. Your gut habits are in a strong place.",
+    },
+    "stress_dominant": {
+        "cluster_id": 1,
+        "name": "Stress-Dominant",
+        "emoji": "⚡",
+        "color": "#facc15",
+        "desc": "Your diet may be decent, but stress and recovery patterns are likely holding your gut score back.",
+    },
+    "recovering_gut": {
+        "cluster_id": 2,
+        "name": "Recovering Gut",
+        "emoji": "🌿",
+        "color": "#60a5fa",
+        "desc": "Recent antibiotics or uneven food habits suggest your microbiome is rebuilding and needs consistency.",
+    },
+    "inflammation_risk": {
+        "cluster_id": 3,
+        "name": "Inflammation Risk",
+        "emoji": "🔥",
+        "color": "#f87171",
+        "desc": "Symptom burden and risk factors are elevated. Focus on recovery habits and consider medical guidance if symptoms persist.",
+    },
+}
+
+
+def infer_archetype(answers: dict) -> dict:
+    diet_positive = sum(answers.get(k, 0) for k in [
+        "fruits_veggies", "fermented", "fiber", "water", "plant_diversity"
+    ])
+    diet_negative = sum(answers.get(k, 0) for k in ["junk_food", "sugar", "alcohol"])
+    diet_score = diet_positive + diet_negative
+    symptom_score = sum(answers.get(k, 0) for k in [
+        "bloating", "acidity", "bristol", "bowel_freq", "food_intol", "nausea"
+    ])
+    stress_score = answers.get("stress", 0) + answers.get("sleep", 0) + answers.get("exercise", 0)
+    antibiotic_score = answers.get("antibiotics", 0) + answers.get("probiotics", 0)
+
+    if symptom_score <= -6 or diet_score <= -4:
+        archetype_key = "inflammation_risk"
+        severity = max(abs(symptom_score), abs(diet_score))
+    elif antibiotic_score <= -2 or diet_score <= 1:
+        archetype_key = "recovering_gut"
+        severity = max(abs(antibiotic_score), abs(diet_score - 2))
+    elif stress_score <= -2:
+        archetype_key = "stress_dominant"
+        severity = abs(stress_score)
+    else:
+        archetype_key = "gut_champion"
+        severity = max(diet_score, 1)
+
+    archetype = ARCHETYPE_LABELS[archetype_key].copy()
+    archetype["confidence"] = max(65, min(95, 70 + int(severity * 4)))
+    return archetype
 
 
 # ── AUTH ROUTES (unchanged from your original) ────────────────────
@@ -204,6 +286,42 @@ def login(req: LoginRequest):
                 return {"user": public_user(u)}
             raise HTTPException(401, "Incorrect password")
     raise HTTPException(404, "No account found with that email")
+
+
+@app.post("/auth/claim-guest-data")
+def claim_guest_data(req: ClaimGuestDataRequest):
+    db = load_db()
+    if req.new_user_id not in db["users"]:
+        raise HTTPException(404, "Target user not found")
+
+    moved_assessment_ids = []
+
+    for record in db.get("history", []):
+        if record.get("user_id") == req.guest_user_id:
+            record["user_id"] = req.new_user_id
+            moved_assessment_ids.append(record.get("id"))
+
+    for checkin in db.get("checkins", []):
+        if checkin.get("user_id") == req.guest_user_id:
+            checkin["user_id"] = req.new_user_id
+
+    for food_entry in db.get("food_log", []):
+        if food_entry.get("user_id") == req.guest_user_id:
+            food_entry["user_id"] = req.new_user_id
+
+    if moved_assessment_ids:
+        user_assessments = db["users"][req.new_user_id].setdefault("assessments", [])
+        for assessment_id in moved_assessment_ids:
+            if assessment_id and assessment_id not in user_assessments:
+                user_assessments.append(assessment_id)
+
+    save_db(db)
+    return {
+        "ok": True,
+        "moved_history": len(moved_assessment_ids),
+        "moved_checkins": len([c for c in db.get("checkins", []) if c.get("user_id") == req.new_user_id]),
+        "moved_food_logs": len([f for f in db.get("food_log", []) if f.get("user_id") == req.new_user_id]),
+    }
 
 
 @app.put("/auth/update-profile")
@@ -434,6 +552,13 @@ def get_insights(user_id: str):
 
 
 # ── NEW: FOOD LOG ─────────────────────────────────────────────────
+
+@app.post("/api/archetype")
+def get_archetype(req: ArchetypeRequest):
+    if not req.answers:
+        raise HTTPException(400, "No answers provided")
+    return infer_archetype(req.answers)
+
 
 @app.post("/api/food")
 def log_food(req: FoodLogRequest):

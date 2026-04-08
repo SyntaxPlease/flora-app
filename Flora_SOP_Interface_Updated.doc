@@ -1,0 +1,301 @@
+Flora
+Gut Microbiome Health Analyzer
+Standard Operating Procedure (Updated Draft Based on Current Interface)
+
+Authors: Preet Kaur Chandan, Sabhyata Gangane, Piya Divekar, Vedant Jadhav, Muhammed Ameen Agasimani
+Organization: Ramrao Adik Institute of Technology, Navi Mumbai
+Class of Work: Software
+
+1. Abstract
+Flora is a mobile-first gut health companion designed as a friendly health assistant for non-technical users. The application combines a 25-question assessment, smart score interpretation, lifestyle and food guidance, gut archetype suggestions, issue detection, and visual progress graphs. The current interface emphasizes clean cards, image-led sections, simple language, and interactive navigation across Home, Analysis, Check-in, and Profile screens. Users can explore focused sections such as Diet, Lifestyle, Symptoms, Medication, Future Outlook, Gut Balance, Food Log, and Gut Archetype through a guided and highly visual dashboard experience.
+
+2. Problem Statement
+Many users experience digestive issues such as bloating, acidity, irregular bowel movements, stress-related gut discomfort, and poor food tolerance, but they do not have access to easy and affordable tools that explain these patterns clearly. Traditional health dashboards are often technical, text-heavy, and difficult to understand. Flora addresses this gap by converting everyday habits and symptom inputs into simple scores, human-friendly explanations, action suggestions, and trend views that help users understand what may be affecting their gut health.
+
+3. Objectives
+1. Provide a user-friendly 25-question gut health quiz across Diet, Medication, Symptoms, and Lifestyle.
+2. Present gut health analysis using graphs, cards, and dialogue boxes instead of complex technical reports.
+3. Make all key sections interactive, including Diet Analysis, Lifestyle Analysis, Symptoms, Medication, Gut Balance, Future Outlook, and Food Log.
+4. Replace technical ML wording with friendly labels such as "Smart Health Insights Engine", "Your Health Status", and "Health Pattern Analyzer".
+5. Show meaningful gut archetypes such as Balanced Gut, Sensitive Gut, Inflamed Gut, and Slow Digestion Type.
+6. Highlight common issues like low fiber intake, poor hydration, high stress, or symptom pressure with cause, impact, and simple next steps.
+7. Support profile-based self-monitoring using BMI calculation and BMI trend visuals.
+8. Keep the design premium, mobile-first, clean, and image-rich so the app feels like a supportive wellness assistant.
+
+4. Technology Stack
+
+4.1 Frontend
+- Framework: React.js (Create React App)
+- Language: JavaScript (JSX)
+- UI Style: Inline styling with shared design tokens in App.js
+- Design Direction: mobile-first cards, graphs, illustrations, image-led category tiles
+- Main File: Flora App/frontend/src/App.js
+- Asset Folder: Flora App/frontend/src/assets/
+
+4.2 Backend
+- Framework: FastAPI
+- Language: Python
+- Server: Uvicorn
+- Storage: JSON file-based application storage through flora_db.json
+- CORS: configurable through ALLOWED_ORIGINS environment variable
+- Deployment-ready config: DB_FILE and ALLOWED_ORIGINS are environment-aware
+
+4.3 Smart Analysis / ML Layer
+The current live app uses a smart scoring and interpretation layer rather than a fully deployed trained ML model in production.
+
+Live application logic currently used:
+- backend/main.py -> run_xgboost(answers)
+  Used during assessment submission to generate overall score, category scores, diversity estimate, and ranked influences.
+- Flora App/frontend/src/App.js -> runDecisionTree(answers)
+  Used to produce a human-friendly pattern label and confidence-style explanation in the Smart Tools section.
+- backend/main.py -> infer_archetype(answers)
+  Used by the Gut Archetype API to classify the user into a practical gut profile.
+- Flora App/frontend/src/App.js -> analyze(answers)
+  Used to power the frontend dashboard, graphs, issue detection, recommendations, and future outlook.
+
+Experimental ML code present in repository:
+- backend/model.py contains prototype XGBoost regressor code
+- backend/model.py contains prototype KMeans clustering code
+- These experimental models are not fully wired into the live request flow at present
+
+Therefore, the production-ready explanation is:
+"Flora is powered by a Smart Health Insights Engine that combines weighted scoring, decision-style interpretation, and archetype inference to explain gut health in simple language."
+
+5. Updated App Structure and Navigation Flow
+
+Root flow:
+Auth Screen -> Quiz Screen -> Dashboard
+
+Bottom navigation:
+- Home
+- Analysis
+- Check-in
+- Profile
+
+Home screen sections:
+- Hero summary card with overall result and friendly status
+- Powered by Smart Health Insights Engine
+- Clickable category cards:
+  - Diet
+  - Lifestyle
+  - Symptoms
+  - Medication
+- Shortcut cards:
+  - Smart Tools
+  - Future Outlook
+  - Gut Balance
+  - Food Log
+
+Analysis screen sections:
+- Your Health Status
+- Smart Tools
+- Future Outlook
+- Gut Balance
+- Gut Archetype
+
+Other major screens:
+- Daily Check-in
+- Profile with BMI calculator and BMI trend
+- Food Log with yesterday summary and next-day suggestion
+
+6. Interface and UX Summary
+The current interface follows a clean dark-green wellness theme with soft gradients, premium cards, illustrations, graphs, and supportive conversational text. The design is intended to feel similar to a premium health tracking application while still remaining unique to Flora. Images and illustrations are used to improve engagement in sections like Diet, Lifestyle, Gut Balance, Home, and Profile.
+
+Visual principles used in the current UI:
+- Large rounded cards
+- Soft green-accent color palette
+- Clear typography hierarchy
+- Clickable category blocks
+- Friendly dialogue boxes below analysis content
+- Graph-led summaries instead of dense text
+- Image-led section art for better user engagement
+
+Suggested screenshot placement in the final formatted SOP:
+- Home Screen: main.pdf
+- Analysis Hub: analysis home page.pdf
+- Diet Analysis: diet.pdf
+- Lifestyle Analysis: lifestyle anaylsis.pdf
+- Smart Tools: smart health.pdf or anaylsis (smart health).pdf
+- Future Outlook: future.pdf or anaylsis future).pdf
+- Gut Balance: gut balance.pdf or anaylsis (gut balance).pdf
+- Gut Analysis / Archetype: anaylsis (gut analysis).pdf
+- Food Log: food log.pdf
+- Profile: profile.pdf
+
+7. Feature Logic Summary
+
+7.1 Quiz and Score Generation
+Users complete a 25-question quiz covering Diet, Medication, Symptoms, and Lifestyle. The answers are sent to the backend through /api/assess and are also interpreted on the frontend for immediate dashboard rendering.
+
+7.2 Your Health Status
+This section converts the user result into:
+- overall gut health score
+- category-wise bar graph
+- trend line graph
+- issue detection cards
+- friendly dialogue box
+
+7.3 Smart Tools
+This section explains the user pattern in simplified terms:
+- Health Pattern Analyzer
+- Habit Path Guide
+- confidence-style visual indicator
+- top influences on gut health
+
+7.4 Future Outlook
+This section predicts what may happen if current habits continue:
+- projection line graph
+- short text explanation
+- high-impact focus areas
+
+7.5 Gut Balance
+This section shows a simplified ecosystem view using:
+- diversity trend
+- category support bars
+- friendly commentary
+- helpful actions
+
+7.6 Gut Archetype
+This section maps the user to one of four practical profiles:
+- Balanced Gut
+- Sensitive Gut
+- Inflamed Gut
+- Slow Digestion Type
+
+Each archetype includes:
+- simple description
+- likely traits
+- next best actions
+
+7.7 Food Log + Next-Day Analysis
+The food log allows users to record meals and see whether a food appears gut-friendly, neutral, or triggering. The page also summarizes yesterday's meals, estimates their likely effect on today's gut comfort, and suggests a better next-day plan.
+
+7.8 Check-in
+The check-in page captures daily signals like bloating, cramps, nausea, gas, heartburn, water, mood, sleep, and stress for ongoing monitoring.
+
+7.9 Profile + BMI
+The Profile screen includes:
+- user identity summary
+- category performance cards
+- BMI calculator
+- BMI category
+- BMI trend graph
+- retake assessment action
+
+8. Backend API Summary
+Important API routes in backend/main.py:
+- POST /auth/register
+- POST /auth/login
+- POST /api/assess
+- POST /api/archetype
+- POST /api/checkin
+- GET /api/checkins/{user_id}
+- GET /api/history/{user_id}
+- GET /api/trends/{user_id}
+- GET /api/microbiome/{user_id}
+- GET /api/insights/{user_id}
+- POST /api/food
+- GET /api/food/{user_id}
+- GET /
+
+9. Deployment
+The project is prepared for deployment using Render.
+
+Current deployment structure:
+- Backend service: flora-api
+- Frontend service: flora-frontend
+- Deployment configuration file: render.yaml
+- Deployment notes: DEPLOYMENT.md
+
+Deployment flow:
+1. Push repository to GitHub.
+2. In Render, create a Blueprint.
+3. Render reads render.yaml and creates both services.
+4. Set environment variables:
+   - backend: ALLOWED_ORIGINS=https://your-frontend-url.onrender.com
+   - frontend: REACT_APP_API_URL=https://your-backend-url.onrender.com
+5. Deploy both services.
+
+Important note:
+The current backend stores data in a local JSON file. This is acceptable for demo and academic submission use, but for long-term production use a managed database such as Postgres is recommended.
+
+10. Installation
+Prerequisites:
+- Node.js 18+
+- Python 3.11+
+- npm
+- pip
+
+Steps:
+1. Open the project in VS Code.
+2. Start backend:
+   - cd backend
+   - python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
+3. Start frontend in a second terminal:
+   - cd "Flora App/frontend"
+   - npm install
+   - npm start
+4. Open http://localhost:3000
+
+11. Software Code - App.js
+The main React application is implemented in:
+- Flora App/frontend/src/App.js
+
+Code appendix reference:
+- The first 100 lines and last 100 lines of App.js are already provided in:
+  app_first_last_100.doc
+
+This keeps the SOP readable while preserving the exact required code extract as a separate submission artifact.
+
+12. User Manual
+
+12.1 Login / Register
+Users can create an account using name, email, and password, or sign in with existing credentials. Guest-style flow is also supported through the dashboard routing logic once a user enters the app flow.
+
+12.2 Quiz
+The quiz presents 25 questions one by one. Each answer updates the user profile and contributes to diet, medication, symptom, and lifestyle scoring.
+
+12.3 Home Screen
+After finishing the quiz, the user lands on the Home screen. This screen shows the main result, powered-by message, category tiles, and shortcuts to deeper analysis sections.
+
+12.4 Category Pages
+Diet and Lifestyle cards are clickable and open focused pages with graphs, issue detection, and simple explanations. Symptoms and Medication also have focused summaries.
+
+12.5 Analysis Screen
+The Analysis tab provides a structured hub for:
+- Your Health Status
+- Smart Tools
+- Future Outlook
+- Gut Balance
+- Gut Archetype
+
+12.6 Check-in
+Users can log how they feel on a given day to create lightweight day-to-day tracking.
+
+12.7 Food Log
+Users can add meals and review how yesterday's meals may be influencing today's digestion and comfort.
+
+12.8 Profile
+Users can view their personal details, result tier, category summaries, BMI status, BMI trend, and retake the assessment.
+
+13. Dataset
+The live user-facing experience primarily works from questionnaire responses and rule-based interpretation. The experimental model file backend/model.py generates synthetic data for XGBoost and KMeans experiments. This means the current academic project includes both:
+- production-style app logic driven by questionnaire input
+- prototype ML experimentation for future integration
+
+14. Copyright and Licensing
+This project is intended for academic demonstration and software documentation purposes. Final publication, licensing, and institutional submission details should be added according to the team or college submission policy.
+
+15. Final Notes for Formatting
+To make this document match the provided SOP template visually:
+- apply the same heading styles from Flora_SOP_Updated.docx
+- insert the relevant PDF screenshots under the matching sections listed above
+- keep the code appendix as a separate attached file
+- use the current app wording:
+  - Smart Health Insights Engine
+  - Your Health Status
+  - Smart Tools
+  - Future Outlook
+  - Gut Balance
+  - Gut Archetype
+

@@ -1,0 +1,209 @@
+Flora App
+Source File: Flora App/frontend/src/App.js
+
+FIRST 100 LINES
+
+   1: import { useState, useEffect } from "react";
+   2: import homeInsightsArt from "./assets/home-insights.svg";
+   3: import gutBalanceArt from "./assets/gut-balance.svg";
+   4: import foodJourneyArt from "./assets/food-journey.svg";
+   5: import archetypeGardenArt from "./assets/archetype-garden.svg";
+   6: import profileWellnessArt from "./assets/profile-wellness.svg";
+   7: import dietSaladArt from "./assets/diet-salad.svg";
+   8: import lifestyleMotionArt from "./assets/lifestyle-motion.svg";
+   9: 
+  10: // â”€â”€â”€ DESIGN TOKENS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  11: const C = {
+  12:   bg:       "#050c07",
+  13:   surface:  "#0a140c",
+  14:   card:     "#0f1e12",
+  15:   border:   "rgba(74,222,128,0.12)",
+  16:   border2:  "rgba(255,255,255,0.06)",
+  17:   green:    "#4ade80",
+  18:   greenDim: "rgba(74,222,128,0.1)",
+  19:   lime:     "#86efac",
+  20:   teal:     "#2dd4bf",
+  21:   yellow:   "#fbbf24",
+  22:   red:      "#f87171",
+  23:   orange:   "#fb923c",
+  24:   blue:     "#60a5fa",
+  25:   purple:   "#a78bfa",
+  26:   text:     "#f0fdf4",
+  27:   muted:    "#6b7280",
+  28:   dim:      "#374151",
+  29:   serif:    "'Cormorant Garamond', Georgia, serif",
+  30:   sans:     "'DM Sans', system-ui, sans-serif",
+  31: };
+  32: 
+  33: const css = `
+  34: @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+  35: *{box-sizing:border-box;margin:0;padding:0}
+  36: body{background:${C.bg};font-family:${C.sans}}
+  37: @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  38: @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  39: @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  40: @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  41: @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.3)}50%{box-shadow:0 0 0 12px rgba(74,222,128,0)}}
+  42: @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  43: @keyframes typing{0%,60%,100%{opacity:1}30%{opacity:0.3}}
+  44: @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  45: .fadeUp{animation:fadeUp 0.6s ease both}
+  46: .fadeIn{animation:fadeIn 0.4s ease both}
+  47: .slideIn{animation:slideIn 0.35s ease both}
+  48: .float{animation:float 4s ease-in-out infinite}
+  49: input,textarea{outline:none}
+  50: input::placeholder,textarea::placeholder{color:${C.muted}}
+  51: ::-webkit-scrollbar{width:4px}
+  52: ::-webkit-scrollbar-track{background:transparent}
+  53: ::-webkit-scrollbar-thumb{background:${C.dim};border-radius:4px}
+  54: .bar-grow{animation:grow 1s cubic-bezier(0.34,1.56,0.64,1) both}
+  55: .metric-card{cursor:pointer;transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1)}
+  56: .metric-card:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(74,222,128,0.3)!important}
+  57: .metric-card:active{transform:scale(0.97)}
+  58: .image-card{transition:transform 0.24s cubic-bezier(0.34,1.56,0.64,1), border-color 0.24s ease, box-shadow 0.24s ease}
+  59: .image-card:hover{transform:translateY(-4px);box-shadow:0 18px 36px rgba(0,0,0,0.18)}
+  60: .image-card-media img{transition:transform 0.35s ease, filter 0.35s ease}
+  61: .image-card:hover .image-card-media img{transform:scale(1.06);filter:saturate(1.08)}
+  62: .feature-tile{position:relative;overflow:hidden}
+  63: .feature-thumb{margin-top:12px;height:74px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03)}
+  64: .feature-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.35s ease, filter 0.35s ease}
+  65: .feature-tile:hover .feature-thumb img{transform:scale(1.08);filter:saturate(1.1)}
+  66: `;
+  67: 
+  68: const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  69: 
+  70: async function apiFetch(path, options = {}) {
+  71:   const response = await fetch(`${API_BASE}${path}`, {
+  72:     ...options,
+  73:     headers: {
+  74:       "Content-Type": "application/json",
+  75:       ...(options.headers || {}),
+  76:     },
+  77:   });
+  78: 
+  79:   const isJson = response.headers.get("content-type")?.includes("application/json");
+  80:   const data = isJson ? await response.json() : null;
+  81: 
+  82:   if (!response.ok) {
+  83:     throw new Error(data?.detail || "Request failed");
+  84:   }
+  85: 
+  86:   return data;
+  87: }
+  88: // â”€â”€â”€ QUIZ QUESTIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  89: const QUESTIONS = [
+  90:   { id:"fruits_veggies",  cat:"Diet",       icon:"ðŸ¥¦", q:"How often do you eat fruits & vegetables?",                    opts:[{l:"Every day",v:3},{l:"A few times a week",v:1},{l:"Rarely",v:-1},{l:"Almost never",v:-2}] },
+  91:   { id:"junk_food",       cat:"Diet",       icon:"ðŸ”", q:"How often do you eat processed or fried food?",                opts:[{l:"Rarely or never",v:2},{l:"Once a week",v:0},{l:"Several times a week",v:-2},{l:"Every day",v:-3}] },
+  92:   { id:"fermented",       cat:"Diet",       icon:"ðŸ«™", q:"Do you eat probiotic foods? (curd, yogurt, kimchi, buttermilk)", opts:[{l:"Every day",v:3},{l:"A few times a week",v:2},{l:"Rarely",v:-1},{l:"Never",v:-2}] },
+  93:   { id:"water",           cat:"Diet",       icon:"ðŸ’§", q:"How much water do you drink daily?",                           opts:[{l:"8+ glasses",v:2},{l:"5â€“7 glasses",v:1},{l:"3â€“4 glasses",v:-1},{l:"Less than 3",v:-2}] },
+  94:   { id:"fiber",           cat:"Diet",       icon:"ðŸŒ¾", q:"How much fiber do you get? (dal, oats, whole grains, veggies)", opts:[{l:"Plenty â€” daily",v:2},{l:"Some â€” most days",v:1},{l:"A little",v:-1},{l:"Very little",v:-2}] },
+  95:   { id:"sugar",           cat:"Diet",       icon:"ðŸ¬", q:"How much added sugar or sugary drinks do you consume?",        opts:[{l:"Rarely â€” very low sugar",v:2},{l:"Occasionally",v:0},{l:"Most days",v:-2},{l:"Multiple times daily",v:-3}] },
+  96:   { id:"plant_diversity", cat:"Diet",       icon:"ðŸŒˆ", q:"How many different plant foods do you eat in a week?",         opts:[{l:"20+ different plants",v:3},{l:"10â€“20 plants",v:1},{l:"5â€“10 plants",v:-1},{l:"Fewer than 5",v:-2}] },
+  97:   { id:"meal_timing",     cat:"Diet",       icon:"ðŸ•", q:"How regular are your mealtimes?",                              opts:[{l:"Very regular â€” same times daily",v:2},{l:"Mostly regular",v:1},{l:"Often irregular",v:-1},{l:"No set schedule",v:-2}] },
+  98:   { id:"alcohol",         cat:"Diet",       icon:"ðŸº", q:"How often do you consume alcohol?",                            opts:[{l:"Never or very rarely",v:2},{l:"Occasionally (1â€“2/week)",v:0},{l:"Several times a week",v:-2},{l:"Daily",v:-3}] },
+  99:   { id:"antibiotics",     cat:"Medication", icon:"ðŸ’Š", q:"Have you taken antibiotics in the last 3 months?",             opts:[{l:"No",v:1},{l:"Yes, short course",v:-2},{l:"Yes, long course",v:-3},{l:"Multiple courses",v:-4}] },
+ 100:   { id:"probiotics",      cat:"Medication", icon:"ðŸŒ¿", q:"Do you take probiotic or prebiotic supplements?",              opts:[{l:"Daily",v:2},{l:"Sometimes",v:1},{l:"Only after antibiotics",v:0},{l:"Never",v:-1}] },
+
+
+LAST 100 LINES
+
+1911:                 <div style={{ fontSize:"0.9rem", color:C.text, fontWeight:600 }}>{a.label}</div>
+1912:                 <div style={{ fontSize:"0.75rem", color:C.muted }}>{a.sub}</div>
+1913:               </div>
+1914:               <div style={{ marginLeft:"auto", color:C.muted }}>â€º</div>
+1915:             </div>
+1916:           ))}
+1917:         </div>
+1918:       </div>
+1919:     );
+1920: 
+1921:     if (activeTab === "checkin") return (
+1922:       <div className="fadeUp" style={{ padding:"20px 16px 100px" }}>
+1923:         <SectionCheckin user={user} onBack={()=>setActiveTab("home")} />
+1924:       </div>
+1925:     );
+1926: 
+1927:     if (activeTab === "profile") return (
+1928:       <div className="fadeUp" style={{ padding:"20px 16px 100px" }}>
+1929:         <h2 style={{ fontFamily:C.serif, fontSize:"2rem", color:C.green, marginBottom:"20px" }}>ðŸ‘¤ Profile</h2>
+1930:         <div style={{ padding:"24px", background:C.card, borderRadius:"20px", border:`1px solid ${C.border}`, marginBottom:"16px", textAlign:"center" }}>
+1931:           <div style={{ width:"64px", height:"64px", borderRadius:"50%", background:C.greenDim, border:`2px solid ${C.green}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem", margin:"0 auto 12px" }}>
+1932:             {user?.name?.[0] || "G"}
+1933:           </div>
+1934:           <div style={{ fontFamily:C.serif, fontSize:"1.4rem", color:C.text }}>{user?.name || "Guest"}</div>
+1935:           <div style={{ fontSize:"0.8rem", color:C.muted }}>{user?.email || "No account"}</div>
+1936:           {result && <div style={{ marginTop:"12px", fontSize:"1rem", color:result.tierColor }}>{result.tierEmoji} {result.tier}</div>}
+1937:         </div>
+1938:         {result && (
+1939:           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"12px", marginBottom:"16px" }}>
+1940:             {Object.entries(result.catScores).map(([cat,score])=>(
+1941:               <div key={cat} style={{ padding:"16px", background:C.card, borderRadius:"14px", border:`1px solid ${C.border2}` }}>
+1942:                 <div style={{ fontSize:"0.75rem", color:C.muted, marginBottom:"4px" }}>{CAT_ICONS[cat]} {cat}</div>
+1943:                 <div style={{ fontFamily:C.serif, fontSize:"1.5rem", color:CAT_COLORS[cat] }}>{score}</div>
+1944:                 <Bar pct={score} color={CAT_COLORS[cat]} height="3px" delay="0s" />
+1945:               </div>
+1946:             ))}
+1947:           </div>
+1948:         )}
+1949:         <div className="metric-card" onClick={onRetake}
+1950:           style={{ padding:"16px 20px", background:C.card, borderRadius:"16px", border:`1px solid ${C.border2}`, cursor:"pointer", display:"flex", alignItems:"center", gap:"12px" }}>
+1951:           <span style={{ fontSize:"1.5rem" }}>ðŸ”„</span>
+1952:           <div>
+1953:             <div style={{ fontSize:"0.9rem", color:C.text }}>Retake Assessment</div>
+1954:             <div style={{ fontSize:"0.75rem", color:C.muted }}>Update your gut health quiz</div>
+1955:           </div>
+1956:         </div>
+1957:       </div>
+1958:     );
+1959:   };
+1960: 
+1961:   return (
+1962:     <div style={{ minHeight:"100vh", background:C.bg, maxWidth:"480px", margin:"0 auto", position:"relative" }}>
+1963:       <style>{css}</style>
+1964:       {renderTab()}
+1965:       <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", maxWidth:"480px", background:"rgba(5,12,7,0.95)", backdropFilter:"blur(20px)", borderTop:`1px solid ${C.border}`, display:"flex", zIndex:100 }}>
+1966:         {NAV.map(tab => (
+1967:           <div key={tab.id} onClick={()=>setActiveTab(tab.id)}
+1968:             style={{ flex:1, padding:"12px 0", display:"flex", flexDirection:"column", alignItems:"center", gap:"4px", cursor:"pointer", transition:"all 0.2s" }}>
+1969:             <span style={{ fontSize:"1.4rem", filter:activeTab===tab.id?"none":"grayscale(1) opacity(0.5)" }}>{tab.icon}</span>
+1970:             <span style={{ fontSize:"0.65rem", color:activeTab===tab.id?C.green:C.muted, fontWeight:activeTab===tab.id?600:400 }}>{tab.label}</span>
+1971:             {activeTab===tab.id && <div style={{ width:"4px", height:"4px", borderRadius:"50%", background:C.green }} />}
+1972:           </div>
+1973:         ))}
+1974:       </div>
+1975:     </div>
+1976:   );
+1977: }
+1978: 
+1979: // â”€â”€â”€ ROOT APP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+1980: export default function App() {
+1981:   const [screen, setScreen] = useState("auth");
+1982:   const [user, setUser] = useState(null);
+1983:   const [answers, setAnswers] = useState({});
+1984: 
+1985:   const handleLogin = (u, goToDashboard=false) => { setUser(u); setScreen(goToDashboard?"dashboard":"quiz"); };
+1986:   const handleQuizDone = async (ans) => {
+1987:     setAnswers(ans);
+1988: 
+1989:     try {
+1990:       await apiFetch("/api/assess", {
+1991:         method:"POST",
+1992:         body:JSON.stringify({ user_id:user?.id, answers:ans })
+1993:       });
+1994:     } catch (error) {
+1995:       console.error("Could not save assessment", error);
+1996:     }
+1997: 
+1998:     setScreen("dashboard");
+1999:   };
+2000:   const handleRetake = () => setScreen("quiz");
+2001: 
+2002:   return (
+2003:     <>
+2004:       <style>{css}</style>
+2005:       {screen==="auth"      && <AuthScreen onLogin={handleLogin} />}
+2006:       {screen==="quiz"      && <QuizScreen user={user} onComplete={handleQuizDone} />}
+2007:       {screen==="dashboard" && <Dashboard user={user} answers={answers} onRetake={handleRetake} />}
+2008:     </>
+2009:   );
+2010: }

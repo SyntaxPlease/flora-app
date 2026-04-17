@@ -2290,8 +2290,238 @@ function Dashboard({ user, answers, onRetake, onLogout, onClaimGuestAccount }) {
   );
 }
 
+// ─── SPLASH SCREEN ────────────────────────────────────────────────────
+const splashCss = `
+@keyframes splashBgPulse {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes splashLogoBoom {
+  0%   { transform: scale(0) rotate(-12deg); opacity: 0; filter: blur(20px); }
+  50%  { transform: scale(1.25) rotate(3deg); opacity: 1; filter: blur(0); }
+  70%  { transform: scale(0.92) rotate(-1deg); opacity: 1; }
+  85%  { transform: scale(1.06) rotate(0.5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes splashGlowRing {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.9; }
+  60%  { opacity: 0.4; }
+  100% { transform: translate(-50%,-50%) scale(4); opacity: 0; }
+}
+@keyframes splashGlowRing2 {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.6; }
+  100% { transform: translate(-50%,-50%) scale(3.2); opacity: 0; }
+}
+@keyframes splashTagline {
+  0%   { opacity: 0; transform: translateY(20px); letter-spacing: 8px; }
+  100% { opacity: 1; transform: translateY(0); letter-spacing: 5px; }
+}
+@keyframes splashSubFade {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 0.7; transform: translateY(0); }
+}
+@keyframes splashParticle {
+  0%   { transform: translate(0, 0) scale(0); opacity: 0; }
+  20%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; }
+}
+@keyframes splashLeaf1 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.8; transform:scale(1) } 100%{ transform:translate(-120px,-180px) rotate(140deg) scale(0.3); opacity:0 } }
+@keyframes splashLeaf2 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.7; transform:scale(1) } 100%{ transform:translate(130px,-160px) rotate(-120deg) scale(0.2); opacity:0 } }
+@keyframes splashLeaf3 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.9; transform:scale(1) } 100%{ transform:translate(-80px,170px) rotate(200deg) scale(0.3); opacity:0 } }
+@keyframes splashLeaf4 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.6; transform:scale(1) } 100%{ transform:translate(150px,120px) rotate(-180deg) scale(0.2); opacity:0 } }
+@keyframes splashLeaf5 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.75; transform:scale(1) } 100%{ transform:translate(40px,-200px) rotate(260deg) scale(0.15); opacity:0 } }
+@keyframes splashLeaf6 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.65; transform:scale(1) } 100%{ transform:translate(-160px,80px) rotate(-240deg) scale(0.25); opacity:0 } }
+@keyframes splashLeaf7 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.8; transform:scale(1) } 100%{ transform:translate(100px,160px) rotate(150deg) scale(0.2); opacity:0 } }
+@keyframes splashLeaf8 { 0%{ transform:translate(0,0) rotate(0deg) scale(0); opacity:0 } 15%{ opacity:0.7; transform:scale(1) } 100%{ transform:translate(-40px,-220px) rotate(-160deg) scale(0.1); opacity:0 } }
+@keyframes splashShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes splashFadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+@keyframes splashDnaStrand {
+  0%   { stroke-dashoffset: 600; opacity: 0; }
+  30%  { opacity: 0.15; }
+  100% { stroke-dashoffset: 0; opacity: 0.06; }
+}
+@keyframes splashCenterGlow {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+  50%  { opacity: 0.3; }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(2.5); }
+}
+`;
+
+const SPLASH_PARTICLES = [
+  { emoji:"🌿", anim:"splashLeaf1", delay:"0.3s", size:"1.6rem" },
+  { emoji:"🍃", anim:"splashLeaf2", delay:"0.4s", size:"1.4rem" },
+  { emoji:"🌱", anim:"splashLeaf3", delay:"0.5s", size:"1.3rem" },
+  { emoji:"✨", anim:"splashLeaf4", delay:"0.35s", size:"1.1rem" },
+  { emoji:"🌸", anim:"splashLeaf5", delay:"0.45s", size:"1.2rem" },
+  { emoji:"🍀", anim:"splashLeaf6", delay:"0.55s", size:"1.5rem" },
+  { emoji:"💚", anim:"splashLeaf7", delay:"0.6s", size:"1rem" },
+  { emoji:"🌾", anim:"splashLeaf8", delay:"0.5s", size:"1.3rem" },
+];
+
+function SplashScreen({ onFinish }) {
+  const [fadeOut, setFadeOut] = useState(false);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setFadeOut(true), 3200);
+    const t2 = setTimeout(() => onFinish(), 3800);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [onFinish]);
+
+  return (
+    <div style={{
+      position:"fixed", inset:0, zIndex:9999,
+      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+      background:`radial-gradient(ellipse at 50% 40%, #0d2818 0%, #071510 40%, #030a06 100%)`,
+      backgroundSize:"200% 200%",
+      animation: fadeOut
+        ? "splashFadeOut 0.6s ease-in-out forwards"
+        : "splashBgPulse 6s ease infinite",
+      overflow:"hidden",
+    }}>
+      <style>{splashCss}</style>
+
+      {/* Ambient background glow */}
+      <div style={{
+        position:"absolute", top:"50%", left:"50%",
+        width:"320px", height:"320px",
+        borderRadius:"50%",
+        background:"radial-gradient(circle, rgba(74,222,128,0.2) 0%, transparent 70%)",
+        animation:"splashCenterGlow 2.5s 0.2s ease-out forwards",
+        pointerEvents:"none",
+      }} />
+
+      {/* Glow ring burst 1 */}
+      <div style={{
+        position:"absolute", top:"50%", left:"50%",
+        width:"120px", height:"120px",
+        borderRadius:"50%",
+        border:"2px solid rgba(74,222,128,0.5)",
+        boxShadow:"0 0 40px rgba(74,222,128,0.3), inset 0 0 40px rgba(74,222,128,0.1)",
+        animation:"splashGlowRing 1.8s 0.4s ease-out forwards",
+        pointerEvents:"none",
+      }} />
+
+      {/* Glow ring burst 2 */}
+      <div style={{
+        position:"absolute", top:"50%", left:"50%",
+        width:"80px", height:"80px",
+        borderRadius:"50%",
+        border:"1.5px solid rgba(134,239,172,0.4)",
+        boxShadow:"0 0 30px rgba(134,239,172,0.2)",
+        animation:"splashGlowRing2 1.6s 0.6s ease-out forwards",
+        pointerEvents:"none",
+      }} />
+
+      {/* Exploding particles */}
+      {SPLASH_PARTICLES.map((p, i) => (
+        <span key={i} style={{
+          position:"absolute", top:"50%", left:"50%",
+          fontSize:p.size,
+          marginTop:"-0.6em", marginLeft:"-0.5em",
+          animation:`${p.anim} 2s ${p.delay} cubic-bezier(0.25,0.46,0.45,0.94) forwards`,
+          opacity:0,
+          pointerEvents:"none",
+          filter:"drop-shadow(0 0 6px rgba(74,222,128,0.4))",
+        }}>{p.emoji}</span>
+      ))}
+
+      {/* Main logo — the BOOM */}
+      <div style={{
+        animation:"splashLogoBoom 1s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+        opacity:0,
+        textAlign:"center",
+        zIndex:2,
+      }}>
+        {/* Leaf icon */}
+        <div style={{
+          fontSize:"4.5rem",
+          filter:"drop-shadow(0 0 30px rgba(74,222,128,0.5)) drop-shadow(0 0 60px rgba(74,222,128,0.2))",
+          marginBottom:"8px",
+        }}>🌿</div>
+
+        {/* Brand name with shimmer */}
+        <div style={{
+          fontFamily:"'Cormorant Garamond', Georgia, serif",
+          fontSize:"3.8rem",
+          fontWeight:700,
+          letterSpacing:"4px",
+          background:"linear-gradient(90deg, #4ade80 0%, #86efac 25%, #ffffff 50%, #86efac 75%, #4ade80 100%)",
+          backgroundSize:"200% auto",
+          WebkitBackgroundClip:"text",
+          WebkitTextFillColor:"transparent",
+          backgroundClip:"text",
+          animation:"splashShimmer 2.5s 0.8s linear infinite",
+          filter:"drop-shadow(0 4px 20px rgba(74,222,128,0.3))",
+        }}>
+          Flora
+        </div>
+      </div>
+
+      {/* Tagline */}
+      <div style={{
+        marginTop:"24px",
+        animation:"splashTagline 0.9s 1.4s ease-out forwards",
+        opacity:0,
+        zIndex:2,
+      }}>
+        <div style={{
+          fontFamily:"'DM Sans', system-ui, sans-serif",
+          fontSize:"0.85rem",
+          fontWeight:400,
+          textTransform:"uppercase",
+          letterSpacing:"5px",
+          color:"rgba(134,239,172,0.7)",
+        }}>Gut Health Intelligence</div>
+      </div>
+
+      {/* Sub-tagline */}
+      <div style={{
+        marginTop:"12px",
+        animation:"splashSubFade 0.8s 2s ease-out forwards",
+        opacity:0,
+        zIndex:2,
+      }}>
+        <div style={{
+          fontFamily:"'DM Sans', system-ui, sans-serif",
+          fontSize:"0.72rem",
+          fontWeight:300,
+          color:"rgba(255,255,255,0.35)",
+          letterSpacing:"1px",
+        }}>powered by microbiome science</div>
+      </div>
+
+      {/* Loading pulse dots */}
+      <div style={{
+        position:"absolute",
+        bottom:"60px",
+        display:"flex",
+        gap:"8px",
+        animation:"splashSubFade 0.6s 2.2s ease-out forwards",
+        opacity:0,
+      }}>
+        {[0,1,2].map(i => (
+          <div key={i} style={{
+            width:"6px", height:"6px",
+            borderRadius:"50%",
+            background:C.green,
+            animation:`typing 1.4s ${i*0.2}s ease-in-out infinite`,
+          }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── ROOT APP ─────────────────────────────────────────────────────────
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [screen, setScreen] = useState("auth");
   const [user, setUser] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -2348,6 +2578,7 @@ export default function App() {
   return (
     <>
       <style>{css}</style>
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
       {screen==="auth"      && <AuthScreen onLogin={handleLogin} />}
       {screen==="quiz"      && <QuizScreen user={user} onComplete={handleQuizDone} />}
       {screen==="dashboard" && <Dashboard user={user} answers={answers} onRetake={handleRetake} onLogout={handleLogout} onClaimGuestAccount={handleClaimGuestAccount} />}

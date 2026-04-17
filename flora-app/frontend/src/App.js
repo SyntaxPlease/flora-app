@@ -100,7 +100,25 @@ function getApiBases() {
   ]);
 }
 
+// ─── API CACHE & FAST TIMEOUT ─────────────────────────────────────────
+const _apiCache = new Map();
+const API_TIMEOUT_MS = 4000; // fast 4-second timeout per base URL
+
+function _fetchWithTimeout(url, options, timeoutMs = API_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 async function apiFetch(path, options = {}) {
+  const method = (options.method || "GET").toUpperCase();
+  const isRead = method === "GET";
+
+  // Return cached response for GET requests
+  if (isRead && _apiCache.has(path)) {
+    return _apiCache.get(path);
+  }
+
   const apiBases = getApiBases();
   let lastError = null;
 
@@ -109,7 +127,7 @@ async function apiFetch(path, options = {}) {
     const hasMoreOptions = index < apiBases.length - 1;
 
     try {
-      const response = await fetch(`${base}${path}`, {
+      const response = await _fetchWithTimeout(`${base}${path}`, {
         ...options,
         headers: {
           "Content-Type": "application/json",
@@ -121,6 +139,7 @@ async function apiFetch(path, options = {}) {
       const data = isJson ? await response.json() : null;
 
       if (response.ok) {
+        if (isRead) _apiCache.set(path, data);
         return data;
       }
 
@@ -134,7 +153,9 @@ async function apiFetch(path, options = {}) {
       throw new Error(message);
     } catch (error) {
       lastError = error;
-      const isNetworkError = error instanceof TypeError || /failed to fetch/i.test(error.message);
+      const isNetworkError = error instanceof TypeError
+        || /failed to fetch/i.test(error.message)
+        || error.name === "AbortError";
 
       if (hasMoreOptions && isNetworkError) {
         continue;
@@ -144,7 +165,7 @@ async function apiFetch(path, options = {}) {
     }
   }
 
-  if (lastError && /failed to fetch/i.test(lastError.message)) {
+  if (lastError && (/failed to fetch/i.test(lastError.message) || lastError.name === "AbortError")) {
     throw new Error("Could not reach the Flora server. Start the backend or set REACT_APP_API_URL.");
   }
 
@@ -1729,22 +1750,7 @@ function SectionMicrobiomeFriendly({ result, answers, historyRecords = [], onBac
 }
 
 function SectionArchetypeFriendly({ answers, onBack }) {
-  const [archetype, setArchetype] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiFetch("/api/archetype", {
-      method:"POST",
-      body:JSON.stringify({ answers })
-    })
-      .then((data) => setArchetype(getArchetypeDetails(data, answers)))
-      .catch(() => setArchetype(getArchetypeDetails(null, answers)))
-      .finally(() => setLoading(false));
-  }, [answers]);
-
-  if (loading) {
-    return <div className="slideIn"><BackBtn onClick={onBack} /><div style={{ color:C.muted, padding:"40px 0", textAlign:"center" }}>Building your archetype...</div></div>;
-  }
+  const archetype = getArchetypeDetails(null, answers);
 
   return (
     <div className="slideIn">
@@ -1977,11 +1983,16 @@ function Dashboard({ user, answers, onRetake, onLogout, onClaimGuestAccount }) {
   const [historyRecords, setHistoryRecords] = useState([]);
   const [trendData, setTrendData] = useState(null);
   const [backendInsights, setBackendInsights] = useState([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const result = answers && Object.keys(answers).length > 0 ? analyze(answers) : null;
   const hasResult = !!result;
 
+  // Only load dashboard data ONCE per user session — never re-fire on section changes
   useEffect(() => {
     let cancelled = false;
+
+    // Skip if already loaded for this user, or if no user/result
+    if (dataLoaded) return;
 
     async function loadDashboardData() {
       if (!user?.id || !hasResult) {
@@ -2004,13 +2015,14 @@ function Dashboard({ user, answers, onRetake, onLogout, onClaimGuestAccount }) {
       setHistoryRecords(historyRes.status === "fulfilled" ? historyRes.value.history || [] : []);
       setTrendData(trendsRes.status === "fulfilled" ? trendsRes.value : null);
       setBackendInsights(insightsRes.status === "fulfilled" ? insightsRes.value.insights || [] : []);
+      setDataLoaded(true);
     }
 
     loadDashboardData();
     return () => {
       cancelled = true;
     };
-  }, [user?.id, hasResult, result?.score]);
+  }, [user?.id, hasResult, dataLoaded]);
 
   const NAV = [
     { id:"home",     icon:"🏠", label:"Home" },

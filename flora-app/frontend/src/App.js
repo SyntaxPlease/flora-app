@@ -2372,7 +2372,8 @@ function SplashScreen({ onFinish }) {
     const t1 = setTimeout(() => setFadeOut(true), 3200);
     const t2 = setTimeout(() => onFinish(), 3800);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [onFinish]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div style={{
